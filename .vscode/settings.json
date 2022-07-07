@@ -1,6 +1,0 @@
-{
-    "python.pythonPath": "/Users/charles/.pyenv/versions/3.8.6/bin/autopep8",
-    "python.defaultInterpreterPath": "/Users/charles/venvs/york_386/bin/python",
-    "python.linting.pylintEnabled": true,
-    "python.linting.enabled": true
-}
