@@ -1,4 +1,4 @@
-.PHONY: clean nvim nlua
+.PHONY: clean nvim nlua bash
 
 help:
 	@echo "make"
@@ -18,3 +18,6 @@ clean:
 nvim:
 	rm -rf ~/.config/nvim/
 	cp -r nvim/ ~/.config/nvim/
+
+bash:
+	cp .bash_profile ~/
