@@ -2,9 +2,6 @@
 # remember to set NOPASSWD up in sudo command
 # sudo hostname -fs "CP-MBP-DRD"
 
-# pip upgrade all
-alias pipua="pip list --outdated --format freeze | cut -d= -f1 | xargs pip install --upgrade"
-
 alias ls="ls -G"
 alias la="ls -Al"
 alias ll="ls -l"
