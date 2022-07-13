@@ -1,4 +1,4 @@
-.PHONY: clean nvim nlua bash
+.PHONY: clean nvim bash
 
 help:
 	@echo "make"
