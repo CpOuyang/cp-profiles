@@ -1,4 +1,4 @@
-.PHONY: clean nvim bash
+.PHONY: clean nvim bash starship
 
 help:
 	@echo "make"
@@ -15,9 +15,12 @@ clean:
 	find . -name '__pycache__' -type d -exec rm -rf  {} +
 	find . -name '.pytest_cache' -type d -exec rm -rf  {} +
 
+bash:
+	cp .bash_profile ~/
+
 nvim:
 	rm -rf ~/.config/nvim/
 	cp -r nvim/ ~/.config/nvim/
 
-bash:
-	cp .bash_profile ~/
+starship:
+	cp .starship.toml ~//config/
