@@ -1,0 +1,30 @@
+[aws]
+disabled = true
+
+[character]
+success_symbol = "[➜](bold green)"
+error_symbol = "[✗](bold red)"
+
+[directory]
+format = "[$path]($style)[$read_only]($read_only_style) "
+truncation_length = 4
+truncate_to_repo = false
+truncation_symbol = "…/"
+
+[gcloud]
+disabled = true
+
+[git_branch]
+style = "bold blue"
+
+[hostname]
+style = "bold yellow"
+
+[time]
+disabled = false
+style = "bold purple"
+time_format = "[%T]"
+utc_time_offset = "+8"
+
+[username]
+style = "bold green"
