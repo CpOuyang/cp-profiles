@@ -28,4 +28,4 @@ time_format = "[%T]"
 utc_time_offset = "+8"
 
 [username]
-style = "bold green"
+style_user = "bold green"
