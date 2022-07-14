@@ -33,3 +33,6 @@ export LC_ALL=en_US.UTF-8
 export PATH="/usr/local/sbin:$PATH"
 export PATH="$(brew --prefix tcl-tk)/lib:$PATH"
 export PATH=/usr/local/texlive/2022basic/bin/universal-darwin:$PATH
+
+# starship
+eval "$(starship init bash)"
