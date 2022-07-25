@@ -34,5 +34,15 @@ export PATH="/usr/local/sbin:$PATH"
 export PATH="$(brew --prefix tcl-tk)/lib:$PATH"
 export PATH=/usr/local/texlive/2022basic/bin/universal-darwin:$PATH
 
-# starship
+# utilities
+which -s starship
+if [[ $? != 0 ]]; then
+   brew install starship
+fi
 eval "$(starship init bash)"
+
+which -s zoxide
+if [[ $? != 0 ]]; then
+   brew install zoxide
+fi
+eval "$(zoxide init bash)"
