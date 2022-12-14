@@ -12,6 +12,8 @@ alias dc="docker-compose"
 
 alias gl="git log --graph --pretty=oneline --abbrev-commit"
 alias gl="git log --pretty=format:'%h %ad | %s %d [%an]' --date=short"
+# Refer to https://www.edureka.co/blog/git-format-commit-history/
+alias gl="git log --pretty=format:'%C(yellow)%h%Creset %ad | %Cgreen%s%Creset %Cred%d%Creset %Cblue[%an]' --date=short"
 
 git_branch() {
 	git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
