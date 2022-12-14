@@ -11,6 +11,7 @@ alias tree="tree -C"
 alias dc="docker-compose"
 
 alias gl="git log --graph --pretty=oneline --abbrev-commit"
+alias gl="git log --pretty=format:'%h %ad | %s %d [%an]' --date=short"
 
 git_branch() {
 	git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
@@ -46,3 +47,4 @@ if [[ $? != 0 ]]; then
    brew install zoxide
 fi
 eval "$(zoxide init bash)"
+export HOMEBREW_GITHUB_API_TOKEN=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
