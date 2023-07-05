@@ -3,13 +3,13 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 
 # check formulas
 must_have () {
-   for item in $*
-   do
-      which -s $item
-      if [[ $? != 0 ]]; then
-         brew install $item
-      fi
-   done
+    for item in $*
+    do
+        which -s $item
+        if [[ $? != 0 ]]; then
+            brew install $item
+        fi
+    done
 }
 must_have git tree starship
 
@@ -24,7 +24,6 @@ alias gl="git log --pretty=format:'%C(yellow)%h%Creset %ad | %Cgreen%s%Creset %C
 
 eval "$(/opt/homebrew/bin/starship init zsh)"
 
-export GITHUB_ACCESS_TOKEN=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
-
 # Custom
 export BAT_THEME=ansi
+export GITHUB_ACCESS_TOKEN=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
