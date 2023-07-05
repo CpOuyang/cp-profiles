@@ -1,52 +1,40 @@
-# allotted mac-book would load the very initial hostname in each session
-# remember to set NOPASSWD up in sudo command
-# sudo hostname -fs "CP-MBP-DRD"
+# Homebrew related paths
+eval "$(/opt/homebrew/bin/brew shellenv)"
 
-alias ls="ls -G"
-alias la="ls -Al"
-alias ll="ls -l"
+# check formulas
+must_have () {
+    for item in $*
+    do
+        which -s $item
+        if [[ $? != 0 ]]; then
+            brew install $item
+        fi
+    done
+}
+must_have git tree starship
 
-alias tree="tree -C"
+alias ll="ls -Gl"
+alias la="ls -GAl"
 
-alias dc="docker-compose"
-
+alias tc="tree -C"
 alias gl="git log --graph --pretty=oneline --abbrev-commit"
 alias gl="git log --pretty=format:'%h %ad | %s %d [%an]' --date=short"
 # Refer to https://www.edureka.co/blog/git-format-commit-history/
 alias gl="git log --pretty=format:'%C(yellow)%h%Creset %ad | %Cgreen%s%Creset %Cred%d%Creset %Cblue[%an]' --date=short"
 
-git_branch() {
-	git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
-}
+# # Notable legacy
+# git_branch () {
+# 	git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/(\1)/'
+# }
+# export CLICOLOR=1
+# export LSCOLORS=gxfxcxdxbxegedabagacad
+# export PS1="\[\e[1;35m\][\t]\[\e[1;32m\]\u\[\e[0;1m\]@\[\e[33m\]\h\[\e[0;1m\]:\[\e[0m\] \[\e[1;36m\]\w\[\e[34m\]$(git_branch)\[\e[0m\] \$ "
 
-export CLICOLOR=1
-export LSCOLORS=gxfxcxdxbxegedabagacad
-export PS1='\[\e[1;35m\][\t]\[\e[1;32m\]\u\[\e[0;1m\]@\[\e[33m\]\h\[\e[0;1m\]:\[\e[0m\] \[\e[1;36m\]\w\[\e[34m\]$(git_branch)\[\e[0m\] \$ '
+# DO NOT USE: eval "$(/opt/homebrew/bin/starship init bash)"
+# For the scripts are errored in bash
+eval "$(/opt/homebrew/bin/starship init bash --print-full-init)"
 
-# enable ~/.pyenv/shims in $PATH
-if command -v pyenv 1>/dev/null 2>&1; then
-    eval "$(pyenv init -)"
-fi
-
-# enable brew bash_completion
-[ -f /usr/local/etc/bash_completion ] && . /usr/local/etc/bash_completion
-
-# locale
-export LC_ALL=en_US.UTF-8
-export PATH="/usr/local/sbin:$PATH"
-export PATH="$(brew --prefix tcl-tk)/lib:$PATH"
-export PATH=/usr/local/texlive/2022basic/bin/universal-darwin:$PATH
-
-# utilities
-which -s starship
-if [[ $? != 0 ]]; then
-   brew install starship
-fi
-eval "$(starship init bash)"
-
-which -s zoxide
-if [[ $? != 0 ]]; then
-   brew install zoxide
-fi
-eval "$(zoxide init bash)"
-export HOMEBREW_GITHUB_API_TOKEN=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
+# Custom
+export BASH_SILENCE_DEPRECATION_WARNING=1   # suppress macos warning
+export BAT_THEME=ansi
+export GITHUB_ACCESS_TOKEN=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
