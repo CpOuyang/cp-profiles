@@ -10,6 +10,7 @@ must_have () {
             brew install $item
         fi
     done
+    unset item
 }
 must_have git tree starship
 
@@ -23,6 +24,15 @@ alias gl="git log --pretty=format:'%h %ad | %s %d [%an]' --date=short"
 alias gl="git log --pretty=format:'%C(yellow)%h%Creset %ad | %Cgreen%s%Creset %Cred%d%Creset %Cblue[%an]' --date=short"
 
 eval "$(/opt/homebrew/bin/starship init zsh)"
+# zsh-autocomplete
+if [ ! -d "$HOME/Projects/worship/zsh-autocomplete" ]; then
+    echo Lack of repo ...
+    mkdir -p $HOME/Projects/worship/ && cd $HOME/Projects/worship/
+    git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git
+    echo
+    echo Restart session to apply ...
+fi
+source $HOME/Projects/worship/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # Custom
 export BAT_THEME=ansi
