@@ -10,17 +10,19 @@ must_have () {
             brew install $item
         fi
     done
+    unset item
 }
 must_have git tree starship
 
-alias ll="ls -Gl"
-alias la="ls -GAl"
-
-alias tc="tree -C"
+alias ba="brew autoremove"
+alias bu="brew update && brew upgrade && brew upgrade --cask \$(brew list --cask)"
 alias gl="git log --graph --pretty=oneline --abbrev-commit"
 alias gl="git log --pretty=format:'%h %ad | %s %d [%an]' --date=short"
 # Refer to https://www.edureka.co/blog/git-format-commit-history/
 alias gl="git log --pretty=format:'%C(yellow)%h%Creset %ad | %Cgreen%s%Creset %Cred%d%Creset %Cblue[%an]' --date=short"
+alias ll="ls -Gl"
+alias la="ls -GAl"
+alias tc="tree -C"
 
 # # Notable legacy
 # git_branch () {

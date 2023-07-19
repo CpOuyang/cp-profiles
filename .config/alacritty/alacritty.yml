@@ -1,0 +1,8 @@
+font:
+  normal:
+    family: Hack Nerd Font Mono
+    style: Regular
+  size: 13
+
+window:
+  startup_mode: Maximized
