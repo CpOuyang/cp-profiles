@@ -15,6 +15,9 @@ must_have () {
 must_have git tree starship
 
 alias ba="brew autoremove"
+alias bc="brew cleanup"
+alias bd="brew doctor"
+alias bl="brew list -l"
 alias bu="brew update && brew upgrade && brew upgrade --cask \$(brew list --cask)"
 alias gl="git log --graph --pretty=oneline --abbrev-commit"
 alias gl="git log --pretty=format:'%h %ad | %s %d [%an]' --date=short"
@@ -25,15 +28,15 @@ alias la="ls -GAl"
 alias tc="tree -C"
 
 eval "$(/opt/homebrew/bin/starship init zsh)"
-# zsh-autocomplete
-if [ ! -d "$HOME/Projects/worship/zsh-autocomplete" ]; then
-    echo Lack of repo ...
-    mkdir -p $HOME/Projects/worship/ && cd $HOME/Projects/worship/
-    git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git
-    echo
-    echo Restart session to apply ...
-fi
-source $HOME/Projects/worship/zsh-autocomplete/zsh-autocomplete.plugin.zsh
+# zsh-autocomplete (has bug along with ripgrep)
+# if [ ! -d "$HOME/Projects/worship/zsh-autocomplete" ]; then
+#     echo Lack of repo ...
+#     mkdir -p $HOME/Projects/worship/ && cd $HOME/Projects/worship/
+#     git clone --depth 1 -- https://github.com/marlonrichert/zsh-autocomplete.git
+#     echo
+#     echo Restart session to apply ...
+# fi
+# source $HOME/Projects/worship/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # Custom
 export BAT_THEME=ansi
