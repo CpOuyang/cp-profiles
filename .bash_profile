@@ -15,6 +15,9 @@ must_have () {
 must_have git tree starship
 
 alias ba="brew autoremove"
+alias bc="brew cleanup"
+alias bd="brew doctor"
+alias bl="brew list -l"
 alias bu="brew update && brew upgrade && brew upgrade --cask \$(brew list --cask)"
 alias gl="git log --graph --pretty=oneline --abbrev-commit"
 alias gl="git log --pretty=format:'%h %ad | %s %d [%an]' --date=short"
