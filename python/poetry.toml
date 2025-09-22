@@ -1,0 +1,8 @@
+# Shared Poetry configuration applied by scripts/setup-python.sh
+[virtualenvs]
+create = true
+in-project = true
+
+[installer]
+# Prefer locking to pip-compatible behaviour
+max-workers = 4

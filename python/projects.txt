@@ -1,0 +1,5 @@
+# Relative paths to Poetry-managed projects.
+# Each directory should contain a pyproject.toml file.
+# Example:
+# apps/service-a
+# libs/shared-utils

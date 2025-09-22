@@ -1,0 +1,9 @@
+[font]
+size = 13
+
+[font.normal]
+family = "Hack Nerd Font Mono"
+style = "Regular"
+
+[window]
+startup_mode = "Maximized"

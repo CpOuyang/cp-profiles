@@ -1,0 +1,112 @@
+# shellcheck shell=bash
+
+# -----------------------------------------------------------------------------
+# cp-profiles Bash profile (macOS)
+# Configures the interactive Bash shell with Homebrew, prompt, and tooling.
+# Machine-specific overrides should go in ~/.bash_profile.local.
+# -----------------------------------------------------------------------------
+
+case $- in
+  *i*) ;;
+  *) return ;;
+ esac
+
+# Homebrew completion scripts expect non-POSIX Bash features such as
+# process substitution; ensure interactive shells opt out of POSIX mode.
+if shopt -oq posix; then
+  set +o posix
+fi
+
+export BASH_SILENCE_DEPRECATION_WARNING=1
+umask 022
+
+# History configuration -------------------------------------------------------
+shopt -s histappend                       # append rather than overwrite history
+export HISTCONTROL=ignoreboth             # ignore dupe commands and those starting with space
+export HISTSIZE=10000
+export HISTFILESIZE=20000
+
+# Path helpers ----------------------------------------------------------------
+path_prepend() {
+  local dir="$1"
+  if [[ -d "$dir" && ":$PATH:" != *":$dir:"* ]]; then
+    PATH="$dir${PATH:+:$PATH}"
+  fi
+}
+
+path_append() {
+  local dir="$1"
+  if [[ -d "$dir" && ":$PATH:" != *":$dir:"* ]]; then
+    PATH+="${PATH:+:}$dir"
+  fi
+}
+
+path_prepend "$HOME/.local/bin"
+path_prepend "/usr/local/sbin"
+
+# Homebrew --------------------------------------------------------------------
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+# Prompt ----------------------------------------------------------------------
+if command -v starship >/dev/null 2>&1; then
+  export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+  eval "$(starship init bash)"
+fi
+
+# Environment -----------------------------------------------------------------
+export EDITOR="${EDITOR:-nvim}"
+export VISUAL="$EDITOR"
+export PAGER="${PAGER:-less -FR}"
+export BAT_THEME="${BAT_THEME:-ansi}"
+export GPG_TTY="$(tty)"
+
+# macOS applications ----------------------------------------------------------
+path_append "/Applications/Docker.app/Contents/Resources/bin"
+
+# Toolchain hooks -------------------------------------------------------------
+if command -v brew >/dev/null 2>&1; then
+  BREW_PREFIX="$(brew --prefix)"
+  if [[ -r "$BREW_PREFIX/etc/profile.d/bash_completion.sh" ]]; then
+    # shellcheck disable=SC1090
+    source "$BREW_PREFIX/etc/profile.d/bash_completion.sh"
+  fi
+  unset BREW_PREFIX
+fi
+
+if [[ -r "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]]; then
+  # shellcheck disable=SC1091
+  source "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+fi
+
+# Aliases ---------------------------------------------------------------------
+alias ll='ls -alhG'
+alias la='ls -A'
+alias lt='ls -ltG'
+alias grep='grep --color=auto'
+alias ..='cd ..'
+alias ...='cd ../..'
+
+alias ba='brew autoremove'
+alias bc='brew cleanup'
+alias bd='brew doctor'
+alias bl='brew list -l'
+alias bu='brew update && brew upgrade && brew upgrade --cask $(brew list --cask)'
+
+alias dc='docker compose'
+
+alias gco='git checkout'
+alias gst='git status -sb'
+alias gl='git log --pretty=format:"%C(yellow)%h%Creset %ad | %Cgreen%s%Creset %Cred%d%Creset %Cblue[%an]" --date=short'
+alias gp='git push'
+
+# Local overrides -------------------------------------------------------------
+for profile in "$HOME/.bash_profile.local" "$HOME/.bashrc.local"; do
+  if [[ -r "$profile" ]]; then
+    # shellcheck disable=SC1090
+    source "$profile"
+  fi
+done
+
+unset -f path_prepend path_append

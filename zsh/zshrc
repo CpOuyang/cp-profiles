@@ -1,0 +1,100 @@
+# cp-profiles Zsh configuration (macOS)
+# Mirrors the Bash profile behaviour with Zsh-friendly syntax.
+
+if [[ ! -o interactive ]]; then
+  return
+fi
+
+umask 022
+
+typeset -U path fpath
+
+# History configuration -------------------------------------------------------
+HISTFILE=${HOME}/.zsh_history
+HISTSIZE=10000
+SAVEHIST=20000
+setopt HIST_IGNORE_DUPS HIST_IGNORE_ALL_DUPS HIST_FIND_NO_DUPS SHARE_HISTORY APPEND_HISTORY
+
+# Path helpers ----------------------------------------------------------------
+path_prepend() {
+  local dir="$1"
+  if [[ -d "$dir" ]]; then
+    path=($dir ${path:#$dir})
+  fi
+}
+
+path_append() {
+  local dir="$1"
+  if [[ -d "$dir" ]]; then
+    path=(${path:#$dir} $dir)
+  fi
+}
+
+path_prepend "$HOME/.local/bin"
+path_prepend "/usr/local/sbin"
+
+# Homebrew --------------------------------------------------------------------
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+fi
+
+# Prompt ----------------------------------------------------------------------
+if command -v starship >/dev/null 2>&1; then
+  export STARSHIP_CONFIG="$HOME/.config/starship.toml"
+  eval "$(starship init zsh)"
+fi
+
+# Environment -----------------------------------------------------------------
+export EDITOR="${EDITOR:-nvim}"
+export VISUAL="$EDITOR"
+export PAGER="${PAGER:-less -FR}"
+export BAT_THEME="${BAT_THEME:-ansi}"
+export GPG_TTY="$(tty)"
+
+# macOS applications ----------------------------------------------------------
+path_append "/Applications/Docker.app/Contents/Resources/bin"
+
+# Toolchain hooks -------------------------------------------------------------
+if command -v brew >/dev/null 2>&1; then
+  BREW_PREFIX="$(brew --prefix)"
+  if [[ -r "$BREW_PREFIX/share/zsh/site-functions" ]]; then
+    fpath=($BREW_PREFIX/share/zsh/site-functions $fpath)
+  fi
+  unset BREW_PREFIX
+fi
+
+if [[ -r "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh" ]]; then
+  source "/opt/homebrew/Caskroom/miniconda/base/etc/profile.d/conda.sh"
+fi
+
+autoload -Uz compinit && compinit
+
+# Aliases ---------------------------------------------------------------------
+alias ll='ls -alhG'
+alias la='ls -A'
+alias lt='ls -ltG'
+alias grep='grep --color=auto'
+alias ..='cd ..'
+alias ...='cd ../..'
+
+alias ba='brew autoremove'
+alias bc='brew cleanup'
+alias bd='brew doctor'
+alias bl='brew list -l'
+alias bu='brew update && brew upgrade && brew upgrade --cask $(brew list --cask)'
+
+alias dc='docker compose'
+
+alias gco='git checkout'
+alias gst='git status -sb'
+alias gl='git log --pretty=format:"%C(yellow)%h%Creset %ad | %Cgreen%s%Creset %Cred%d%Creset %Cblue[%an]" --date=short'
+alias gp='git push'
+
+# Local overrides -------------------------------------------------------------
+for profile in "$HOME/.zshrc.local" "$HOME/.zshenv.local"; do
+  if [[ -r "$profile" ]]; then
+    source "$profile"
+  fi
+done
+
+unset -f path_prepend path_append
