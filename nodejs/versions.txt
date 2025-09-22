@@ -1,0 +1,4 @@
+# List desired Node.js versions (for nvm, asdf, or fnm) in priority order.
+# Lines starting with # are ignored.
+# Example:
+# 20.11.0
