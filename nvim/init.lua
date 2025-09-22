@@ -1,4 +1,7 @@
-require "autocmds"
-require "keymaps"
-require "options"
-require "plugins"
+vim.g.mapleader = " "
+vim.g.maplocalleader = ","
+
+require("core.options")
+require("core.autocmds")
+require("core.keymaps")
+require("plugins")

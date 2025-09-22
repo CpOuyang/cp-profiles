@@ -1,54 +1,27 @@
 SHELL := /bin/bash
 
-SHELL_PROFILES := bash zsh fish
-TERMINAL_APPS := alacritty kitty
 DRY_RUN ?= 0
 DRY_COND = [ -n "$(DRY_RUN)" ] && [ "$(DRY_RUN)" != "0" ]
 
-.PHONY: help clean shell shell-bash shell-zsh shell-fish terminal terminal-alacritty terminal-kitty bash bash-local zsh fish alacritty kitty starship
-
-help: ## Show the basic help.
-	@printf 'make targets:\n'
-	@grep -E '^[a-zA-Z0-9_-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  %-12s %s\n", $$1, $$2}'
-	@printf '\nUse DRY_RUN=1 make <target> to preview actions without making changes.\n'
-	@if $(DRY_COND); then printf '(dry-run mode active)\n'; fi
-
-# Root-level directories that are safe to delete when cleaning the workspace
-CLEAN_ROOT_DIRS := \
-	node_modules \
-	build \
-	dist \
-	out \
-	tmp \
-	temp \
-	coverage \
-	target \
-	logs \
-	.cache \
-	.pytest_cache \
-	.mypy_cache \
-	.ruff_cache \
-	.venv \
-	venv \
-	ENV \
-	env \
-	.idea \
-	.vscode
-
-# Directory patterns searched recursively and removed with find
-CLEAN_DIR_PATTERNS := __pycache__ *.egg-info .pytest_cache .mypy_cache .ruff_cache .cache
-
-# File patterns searched recursively and deleted with find
+CLEAN_TOP_LEVEL := node_modules build dist out tmp temp coverage .cache .venv venv ENV env target logs
+CLEAN_DIR_PATTERNS := __pycache__ .pytest_cache .mypy_cache .ruff_cache .cache
 CLEAN_FILE_PATTERNS := *~ .DS_Store *.pyc *.log Thumbs.db .project .coverage *.coverage coverage.xml *.swp *.swo
 
-clean: ## Remove generated files, caches, and build outputs.
-	@echo "==> Removing top-level build and cache directories"
-	@for dir in $(CLEAN_ROOT_DIRS); do \
+.PHONY: help clean bash zsh fish alacritty kitty tmux python starship nvim nvim-clean homebrew
+
+help: ## 列出可用指令與說明
+	@printf 'make targets:\n'
+	@grep -E '^[a-zA-Z0-9_-]+:.*##' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*## "}; {printf "  %-18s %s\n", $$1, $$2}'
+	@printf '\n可在前綴加上 DRY_RUN=1 預覽動作，例如 DRY_RUN=1 make bash\n'
+	@printf '若只想同步檔案可加 SKIP_BREW=1，避免重複執行 brew。\n'
+
+clean: ## 清除常見建置與快取資料夾
+	@echo "==> Removing common build/venv directories"
+	@for dir in $(CLEAN_TOP_LEVEL); do \
 		if [ -e "$$dir" ]; then \
 			if $(DRY_COND); then \
 				echo "[dry-run] rm -rf $$dir"; \
 			else \
-				echo "   rm -rf $$dir"; \
 				rm -rf "$$dir"; \
 			fi; \
 		fi; \
@@ -62,7 +35,7 @@ clean: ## Remove generated files, caches, and build outputs.
 			find . -type d -name "$$pattern" -prune -exec rm -rf {} +; \
 		fi; \
 	done
-	@echo "==> Removing generated files matching patterns"
+	@echo "==> Removing cached files"
 	@set -f; \
 	for pattern in $(CLEAN_FILE_PATTERNS); do \
 		if $(DRY_COND); then \
@@ -73,80 +46,17 @@ clean: ## Remove generated files, caches, and build outputs.
 	done
 	@echo "==> Clean complete"
 
-bash:
-	@:
+homebrew: ## 檢查 Homebrew 並安裝預設套件
+	@DRY_RUN=$(DRY_RUN) ./scripts/setup-homebrew.sh
 
-zsh:
-	@:
+# --- Shell profiles ---------------------------------------------------------
 
-fish:
-	@:
-
-alacritty:
-	@:
-
-kitty:
-	@:
-
-shell: ## Sync a shell profile to the home directory. Usage: make shell <bash|zsh|fish>
-	@profile="${PROFILE}"; \
-	goals="$(MAKECMDGOALS)"; \
-	if [ -z "$$profile" ]; then \
-	  for goal in $$goals; do \
-	    [ "$$goal" = "$@" ] && continue; \
-	    for candidate in $(SHELL_PROFILES); do \
-	      if [ "$$candidate" = "$$goal" ]; then \
-	        profile="$$goal"; \
-	        break 2; \
-	      fi; \
-	    done; \
-	  done; \
-	fi; \
-	if [ -z "$$profile" ]; then \
-	  echo "Usage: make shell <bash|zsh|fish>"; \
-	  exit 2; \
-	fi; \
-	for candidate in $(SHELL_PROFILES); do \
-	  if [ "$$candidate" = "$$profile" ]; then \
-	    $(MAKE) --no-print-directory DRY_RUN=$(DRY_RUN) shell-$$profile; \
-	    exit 0; \
-	  fi; \
-	done; \
-	echo "Unknown shell profile: $$profile"; \
-	exit 1
-
-terminal: ## Sync a terminal profile to the home directory. Usage: make terminal <alacritty|kitty>
-	@app="${APP}"; \
-	goals="$(MAKECMDGOALS)"; \
-	if [ -z "$$app" ]; then \
-	  for goal in $$goals; do \
-	    [ "$$goal" = "$@" ] && continue; \
-	    for candidate in $(TERMINAL_APPS); do \
-	      if [ "$$candidate" = "$$goal" ]; then \
-	        app="$$goal"; \
-	        break 2; \
-	      fi; \
-	    done; \
-	  done; \
-	fi; \
-	if [ -z "$$app" ]; then \
-	  echo "Usage: make terminal <alacritty|kitty>"; \
-	  exit 2; \
-	fi; \
-	for candidate in $(TERMINAL_APPS); do \
-	  if [ "$$candidate" = "$$app" ]; then \
-	    $(MAKE) --no-print-directory DRY_RUN=$(DRY_RUN) terminal-$$app; \
-	    exit 0; \
-	  fi; \
-	done; \
-	echo "Unknown terminal profile: $$app"; \
-	exit 1
-
-shell-bash:
+bash: ## 同步 Bash 設定到 ~/.bash_profile，並安裝常用 CLI
+	@$(MAKE) --no-print-directory homebrew
 	@if $(DRY_COND); then \
-		echo "[dry-run] install shell/bash_profile -> ~/.bash_profile"; \
+		echo "[dry-run] install bash/bash_profile -> ~/.bash_profile"; \
 	else \
-		install -m 0644 shell/bash_profile ~/.bash_profile; \
+		install -m 0644 bash/bash_profile ~/.bash_profile; \
 	fi
 	@if $(DRY_COND); then \
 		echo "[dry-run] ./scripts/ensure-bash-local.sh"; \
@@ -154,64 +64,99 @@ shell-bash:
 		./scripts/ensure-bash-local.sh; \
 	fi
 
-shell-zsh:
+zsh: ## 同步 Zsh 設定到 ~/.zshrc
 	@if $(DRY_COND); then \
-		echo "[dry-run] install shell/zshrc -> ~/.zshrc"; \
+		echo "[dry-run] install zsh/zshrc -> ~/.zshrc"; \
 	else \
-		install -m 0644 shell/zshrc ~/.zshrc; \
+		install -m 0644 zsh/zshrc ~/.zshrc; \
 	fi
 
-shell-fish:
+fish: ## 同步 Fish 設定到 ~/.config/fish/config.fish
 	@if $(DRY_COND); then \
 		echo "[dry-run] install -d ~/.config/fish"; \
 	else \
 		install -d ~/.config/fish; \
 	fi
 	@if $(DRY_COND); then \
-		echo "[dry-run] install shell/config.fish -> ~/.config/fish/config.fish"; \
+		echo "[dry-run] install fish/config.fish -> ~/.config/fish/config.fish"; \
 	else \
-		install -m 0644 shell/config.fish ~/.config/fish/config.fish; \
+		install -m 0644 fish/config.fish ~/.config/fish/config.fish; \
 	fi
 
-terminal-alacritty:
+# --- Terminal configs ------------------------------------------------------
+
+alacritty: ## 安裝 Alacritty (Homebrew cask) 並同步設定
+	@DRY_RUN=$(DRY_RUN) BREW_FORMULAS="" BREW_CASKS="alacritty" ./scripts/setup-homebrew.sh
 	@dest="$$HOME/.config/alacritty"; \
 	if $(DRY_COND); then \
 		echo "[dry-run] rm -rf $$dest"; \
 		echo "[dry-run] install -d $$HOME/.config"; \
-		echo "[dry-run] cp -R terminal/alacritty $$dest"; \
+		echo "[dry-run] cp -R alacritty $$dest"; \
 	else \
 		rm -rf "$$dest"; \
 		install -d "$$HOME/.config"; \
-		cp -R terminal/alacritty "$$dest"; \
+		cp -R alacritty "$$dest"; \
 	fi
 
-terminal-kitty:
+kitty: ## 安裝 Kitty (Homebrew cask) 並同步設定
+	@DRY_RUN=$(DRY_RUN) BREW_FORMULAS="" BREW_CASKS="kitty" ./scripts/setup-homebrew.sh
 	@dest="$$HOME/.config/kitty"; \
 	if $(DRY_COND); then \
 		echo "[dry-run] rm -rf $$dest"; \
 		echo "[dry-run] install -d $$HOME/.config"; \
-		echo "[dry-run] cp -R terminal/kitty $$dest"; \
+		echo "[dry-run] cp -R kitty $$dest"; \
 	else \
 		rm -rf "$$dest"; \
 		install -d "$$HOME/.config"; \
-		cp -R terminal/kitty "$$dest"; \
+		cp -R kitty "$$dest"; \
 	fi
 
-bash-local:
+# --- Prompt / tmux ---------------------------------------------------------
+
+tmux: ## 安裝 tmux 並同步 ~/.tmux.conf
+	@DRY_RUN=$(DRY_RUN) BREW_FORMULAS="tmux" ./scripts/setup-homebrew.sh
 	@if $(DRY_COND); then \
-		echo "[dry-run] ./scripts/ensure-bash-local.sh"; \
+		echo "[dry-run] install tmux/tmux.conf -> ~/.tmux.conf"; \
 	else \
-		./scripts/ensure-bash-local.sh; \
+		install -m 0644 tmux/tmux.conf ~/.tmux.conf; \
 	fi
 
-starship: ## Copy starship.toml to ~/.config/.
+starship: ## 同步 Starship 主題到 ~/.config/starship.toml
 	@if $(DRY_COND); then \
 		echo "[dry-run] install -d ~/.config"; \
 	else \
 		install -d ~/.config; \
 	fi
 	@if $(DRY_COND); then \
-		echo "[dry-run] install starship.toml -> ~/.config/starship.toml"; \
+		echo "[dry-run] install starship/starship.toml -> ~/.config/starship.toml"; \
 	else \
-		install -m 0644 starship.toml ~/.config/starship.toml; \
+		install -m 0644 starship/starship.toml ~/.config/starship.toml; \
 	fi
+
+# --- Editors / languages ---------------------------------------------------
+
+nvim: ## 同步 Neovim 設定到 ~/.config/nvim
+	@dest="$$HOME/.config/nvim"; backup="$$dest.bak-$$(date +%Y%m%d%H%M%S)"; \
+	if $(DRY_COND); then \
+		echo "[dry-run] (if exists) mv $$dest $$backup"; \
+		echo "[dry-run] rm -rf $$dest"; \
+		echo "[dry-run] install -d $$dest"; \
+		echo "[dry-run] cp -R nvim/. $$dest"; \
+	else \
+		if [ -d "$$dest" ] || [ -f "$$dest" ]; then \
+			echo "Backing up existing Neovim config to $$backup"; \
+			mv "$$dest" "$$backup"; \
+		fi; \
+		install -d "$$dest"; \
+		cp -R nvim/. "$$dest"; \
+	fi
+
+nvim-clean: ## 移除 ~/.config/nvim 方便重新同步
+	@if $(DRY_COND); then \
+		echo "[dry-run] rm -rf ~/.config/nvim"; \
+	else \
+		rm -rf ~/.config/nvim; \
+	fi
+
+python: ## 安裝指定位 Python 版本並同步 Poetry 設定/專案
+	@DRY_RUN=$(DRY_RUN) ./scripts/setup-python.sh
