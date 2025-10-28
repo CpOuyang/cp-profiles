@@ -1,0 +1,43 @@
+name: Neovim CI
+
+on:
+  push:
+    paths:
+      - 'nvim/**'
+      - 'scripts/test-nvim.sh'
+      - '.github/workflows/nvim.yml'
+      - 'Makefile'
+  pull_request:
+    paths:
+      - 'nvim/**'
+      - 'scripts/test-nvim.sh'
+      - '.github/workflows/nvim.yml'
+      - 'Makefile'
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Stylua check
+        uses: JohnnyMorganz/stylua-action@v3
+        with:
+          version: v0.20.0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          args: --check nvim
+
+      - name: Install tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ripgrep fd-find curl
+          curl -L -o /tmp/nvim.tar.gz https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz
+          sudo tar -C /usr/local -xzf /tmp/nvim.tar.gz
+          sudo ln -sf "$(command -v fdfind)" /usr/local/bin/fd
+          echo "/usr/local/nvim-linux64/bin" >> "$GITHUB_PATH"
+
+      - name: Headless Lazy sync
+        env:
+          SKIP_STYLUA: "1"
+        run: ./scripts/test-nvim.sh

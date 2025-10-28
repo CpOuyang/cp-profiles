@@ -45,7 +45,7 @@ opt.listchars = { tab = "» ", trail = "·", extends = "…", precedes = "…" }
 opt.undofile = true
 
 opt.fillchars = { eob = " " }
-opt.shortmess:append "c"
+opt.shortmess:append("c")
 
 g.loaded_ruby_provider = 0
 g.loaded_node_provider = 0
