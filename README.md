@@ -14,24 +14,28 @@
 - `tmux/`：tmux 配置，統一快捷鍵與狀態列。
 - `alacritty/`：Alacritty 終端設定，對應 `~/.config/alacritty/`。
 - `kitty/`：Kitty 終端設定，對應 `~/.config/kitty/`。
+- `iterm2/`：iTerm2 動態 Profiles 與說明文件。
 - `nvim/`：Neovim Lua 設定與外掛管理。
 - `python/`：pyenv 版本清單、Poetry 預設值與專案列表。
 - `nodejs/`：預留的 Node.js 版本／工具鏈設定。
 - `starship/`：Starship 提示字串主題。
 - `scripts/`：部署與自動化腳本。
+- `.github/workflows/`：CI 工作流程，目前涵蓋 Neovim 設定驗證。
 - `Makefile`：集中管理同步與安裝指令。
 - `.reference/`：歷史或實驗設定的歸檔區。
 
 ## 待辦規劃
-- `nvim/`：補齊 Lua 模組說明、外掛測試流程與 CI 檢查
 - `vscode/`：收錄設定檔、鍵盤配置與 snippets
 - `python/`：預設安裝更多常用 Python 版本 / 套件
 - `nodejs/`：新增版本管理與常用全域工具建議
 
+## 已完成項目
+- 2025-09-22：Neovim Lua 模組說明、`make nvim-test` 驗證流程與 CI 檢查（由 `scripts/test-nvim.sh` 與 `.github/workflows/nvim.yml` 提供）
+
 ## 前置需求
 - macOS（主要開發環境）以及 [Homebrew](https://brew.sh/)；若使用 Linux 或無法安裝 Homebrew，可在執行指令時帶上 `SKIP_BREW=1` 並手動安裝所需套件。
 - 基本開發工具：`git`、`curl`、`pyenv`、`poetry`。缺少時腳本會給出安裝連結。
-- 建議事先安裝常用字型（例如 Nerd Font）以確保終端顯示正常。
+- 建議事先安裝 Maple Mono Normal NF CN（`make alacritty|kitty|iterm2` 會自動檢查字型，缺少時透過 Homebrew 安裝 `font-maple-mono-nerd-font`）。
 
 ## 使用方式
 1. 先檢視資料夾內容，把與機器相關的私人資訊（token、路徑等）改寫到 `*.local` 類別的忽略檔。
@@ -40,8 +44,9 @@
 4. `make bash|zsh|fish`：同步對應 shell 設定；Bash 版會自動建立 `~/.bash_profile.local`。`make bash` 會額外安裝常用 CLI（starship、fzf、ripgrep）。
 5. `make tmux`：安裝 tmux 並複製設定至 `~/.tmux.conf`。
 6. `make nvim`：同步 Neovim 設定到 `~/.config/nvim/`；第一次啟動建議執行 `:Lazy sync`、`:MasonInstall stylua prettier shfmt black`。
-7. `make alacritty|kitty` 與 `make starship`：安裝終端應用程式（透過 Homebrew cask）並複製對應設定。
-8. 需要預覽時可在前面加上 `DRY_RUN=1`，例如 `DRY_RUN=1 make tmux`，指令只會印出動作不寫入檔案。可搭配 `SKIP_BREW=1` 加速純檔案同步，或先執行 `make homebrew` 單獨檢查套件。
+7. `make nvim-test`：在 headless 模式下進行 Lazy 安裝並執行 stylua 檢查，確保 Neovim 設定可順利啟動。
+8. `make alacritty|kitty|iterm2` 與 `make starship`：安裝終端應用程式（透過 Homebrew cask）並複製對應設定檔。
+9. 需要預覽時可在前面加上 `DRY_RUN=1`，例如 `DRY_RUN=1 make tmux`，指令只會印出動作不寫入檔案。可搭配 `SKIP_BREW=1` 加速純檔案同步，或先執行 `make homebrew` 單獨檢查套件。
 
 ## 注意事項
 - 目前僅針對 macOS 設計，其他作業系統暫不支援。

@@ -74,10 +74,34 @@ require("lazy").setup({
       },
     },
     keys = {
-      { "<leader>ff", function() require("telescope.builtin").find_files() end, desc = "Find files" },
-      { "<leader>fg", function() require("telescope.builtin").live_grep() end, desc = "Live grep" },
-      { "<leader>fb", function() require("telescope.builtin").buffers() end, desc = "Buffer list" },
-      { "<leader>fh", function() require("telescope.builtin").help_tags() end, desc = "Help tags" },
+      {
+        "<leader>ff",
+        function()
+          require("telescope.builtin").find_files()
+        end,
+        desc = "Find files",
+      },
+      {
+        "<leader>fg",
+        function()
+          require("telescope.builtin").live_grep()
+        end,
+        desc = "Live grep",
+      },
+      {
+        "<leader>fb",
+        function()
+          require("telescope.builtin").buffers()
+        end,
+        desc = "Buffer list",
+      },
+      {
+        "<leader>fh",
+        function()
+          require("telescope.builtin").help_tags()
+        end,
+        desc = "Help tags",
+      },
     },
     config = function()
       local telescope = require("telescope")
@@ -148,6 +172,45 @@ require("lazy").setup({
     end,
   },
   {
+    "folke/flash.nvim",
+    event = "VeryLazy",
+    opts = {},
+    keys = {
+      {
+        "s",
+        mode = { "n", "x", "o" },
+        function()
+          require("flash").jump()
+        end,
+        desc = "Flash jump",
+      },
+      {
+        "S",
+        mode = { "n", "x", "o" },
+        function()
+          require("flash").treesitter()
+        end,
+        desc = "Flash treesitter",
+      },
+      {
+        "r",
+        mode = "o",
+        function()
+          require("flash").remote()
+        end,
+        desc = "Flash remote",
+      },
+      {
+        "R",
+        mode = { "o", "x" },
+        function()
+          require("flash").treesitter_search()
+        end,
+        desc = "Flash search",
+      },
+    },
+  },
+  {
     "akinsho/toggleterm.nvim",
     version = "*",
     cmd = "ToggleTerm",
@@ -157,6 +220,18 @@ require("lazy").setup({
         direction = "float",
       })
     end,
+  },
+  {
+    "stevearc/aerial.nvim",
+    cmd = { "AerialToggle", "AerialOpen", "AerialInfo" },
+    keys = {
+      { "<leader>o", "<cmd>AerialToggle!<CR>", desc = "Toggle outline" },
+    },
+    opts = {
+      attach_mode = "global",
+      layout = { max_width = { 40, 0.25 } },
+      show_guides = true,
+    },
   },
   {
     "lukas-reineke/indent-blankline.nvim",
@@ -304,6 +379,42 @@ require("lazy").setup({
     end,
   },
   {
+    "rcarriga/nvim-notify",
+    event = "VeryLazy",
+    config = function()
+      local notify = require("notify")
+      notify.setup({
+        background_colour = "#1a1b26",
+        stages = "fade",
+      })
+      vim.notify = notify
+    end,
+  },
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "rcarriga/nvim-notify",
+    },
+    opts = {
+      presets = {
+        bottom_search = true,
+        command_palette = true,
+        inc_rename = true,
+        long_message_to_split = true,
+      },
+      lsp = {
+        progress = { enabled = false },
+        hover = { enabled = true },
+        signature = { enabled = true },
+      },
+      views = {
+        mini = { border = { style = "rounded" } },
+      },
+    },
+  },
+  {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
     dependencies = {
@@ -357,6 +468,106 @@ require("lazy").setup({
         }),
       })
     end,
+  },
+  {
+    "mfussenegger/nvim-dap",
+    dependencies = {
+      "rcarriga/nvim-dap-ui",
+      "theHamsta/nvim-dap-virtual-text",
+      "jay-babu/mason-nvim-dap.nvim",
+    },
+    keys = {
+      {
+        "<leader>db",
+        function()
+          require("dap").toggle_breakpoint()
+        end,
+        desc = "DAP toggle breakpoint",
+      },
+      {
+        "<leader>dc",
+        function()
+          require("dap").continue()
+        end,
+        desc = "DAP continue",
+      },
+      {
+        "<leader>di",
+        function()
+          require("dap").step_into()
+        end,
+        desc = "DAP step into",
+      },
+      {
+        "<leader>do",
+        function()
+          require("dap").step_over()
+        end,
+        desc = "DAP step over",
+      },
+      {
+        "<leader>dO",
+        function()
+          require("dap").step_out()
+        end,
+        desc = "DAP step out",
+      },
+      {
+        "<leader>dt",
+        function()
+          require("dapui").toggle({ reset = true })
+        end,
+        desc = "DAP toggle UI",
+      },
+      {
+        "<leader>dr",
+        function()
+          require("dap").repl.toggle()
+        end,
+        desc = "DAP toggle REPL",
+      },
+    },
+    config = function()
+      local dap = require("dap")
+      local dapui = require("dapui")
+      require("nvim-dap-virtual-text").setup()
+      dapui.setup()
+
+      local mason_dap = require("mason-nvim-dap")
+      mason_dap.setup({
+        ensure_installed = { "python", "delve", "node2" },
+        automatic_installation = true,
+      })
+      mason_dap.setup_handlers()
+
+      dap.listeners.after.event_initialized["dapui_config"] = function()
+        dapui.open()
+      end
+      dap.listeners.before.event_terminated["dapui_config"] = function()
+        dapui.close()
+      end
+      dap.listeners.before.event_exited["dapui_config"] = function()
+        dapui.close()
+      end
+    end,
+  },
+  {
+    "neogitorg/neogit",
+    cmd = "Neogit",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    keys = {
+      {
+        "<leader>gs",
+        function()
+          require("neogit").open()
+        end,
+        desc = "Open Neogit",
+      },
+    },
+    opts = {
+      disable_commit_confirmation = true,
+      integrations = { diffview = false },
+    },
   },
   {
     "folke/trouble.nvim",

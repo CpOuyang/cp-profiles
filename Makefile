@@ -1,13 +1,15 @@
 SHELL := /bin/bash
 
 DRY_RUN ?= 0
+SKIP_STYLUA ?= 0
+SKIP_BREW ?= 0
 DRY_COND = [ -n "$(DRY_RUN)" ] && [ "$(DRY_RUN)" != "0" ]
 
 CLEAN_TOP_LEVEL := node_modules build dist out tmp temp coverage .cache .venv venv ENV env target logs
 CLEAN_DIR_PATTERNS := __pycache__ .pytest_cache .mypy_cache .ruff_cache .cache
 CLEAN_FILE_PATTERNS := *~ .DS_Store *.pyc *.log Thumbs.db .project .coverage *.coverage coverage.xml *.swp *.swo
 
-.PHONY: help clean bash zsh fish alacritty kitty tmux python starship nvim nvim-clean homebrew
+.PHONY: help clean bash zsh fish alacritty kitty iterm2 tmux python starship nvim nvim-test homebrew
 
 help: ## 列出可用指令與說明
 	@printf 'make targets:\n'
@@ -87,6 +89,7 @@ fish: ## 同步 Fish 設定到 ~/.config/fish/config.fish
 
 alacritty: ## 安裝 Alacritty (Homebrew cask) 並同步設定
 	@DRY_RUN=$(DRY_RUN) BREW_FORMULAS="" BREW_CASKS="alacritty" ./scripts/setup-homebrew.sh
+	@DRY_RUN=$(DRY_RUN) SKIP_BREW=$(SKIP_BREW) ./scripts/ensure-font.sh "Maple Mono Normal NF CN" "font-maple-mono-nerd-font"
 	@dest="$$HOME/.config/alacritty"; \
 	if $(DRY_COND); then \
 		echo "[dry-run] rm -rf $$dest"; \
@@ -100,6 +103,7 @@ alacritty: ## 安裝 Alacritty (Homebrew cask) 並同步設定
 
 kitty: ## 安裝 Kitty (Homebrew cask) 並同步設定
 	@DRY_RUN=$(DRY_RUN) BREW_FORMULAS="" BREW_CASKS="kitty" ./scripts/setup-homebrew.sh
+	@DRY_RUN=$(DRY_RUN) SKIP_BREW=$(SKIP_BREW) ./scripts/ensure-font.sh "Maple Mono Normal NF CN" "font-maple-mono-nerd-font"
 	@dest="$$HOME/.config/kitty"; \
 	if $(DRY_COND); then \
 		echo "[dry-run] rm -rf $$dest"; \
@@ -109,6 +113,19 @@ kitty: ## 安裝 Kitty (Homebrew cask) 並同步設定
 		rm -rf "$$dest"; \
 		install -d "$$HOME/.config"; \
 		cp -R kitty "$$dest"; \
+	fi
+
+iterm2: ## 安裝 iTerm2 (Homebrew cask) 並同步動態設定檔
+	@DRY_RUN=$(DRY_RUN) BREW_FORMULAS="" BREW_CASKS="iterm2" ./scripts/setup-homebrew.sh
+	@DRY_RUN=$(DRY_RUN) SKIP_BREW=$(SKIP_BREW) ./scripts/ensure-font.sh "Maple Mono Normal NF CN" "font-maple-mono-nerd-font"
+	@dest="$$HOME/Library/Application Support/iTerm2/DynamicProfiles"; \
+	file="cp-profiles.json"; \
+	if $(DRY_COND); then \
+		echo "[dry-run] install -d \"$$dest\""; \
+		echo "[dry-run] install -m 0644 iterm2/DynamicProfiles/$$file -> \"$$dest/$$file\""; \
+	else \
+		install -d "$$dest"; \
+		install -m 0644 "iterm2/DynamicProfiles/$$file" "$$dest/$$file"; \
 	fi
 
 # --- Prompt / tmux ---------------------------------------------------------
@@ -151,12 +168,8 @@ nvim: ## 同步 Neovim 設定到 ~/.config/nvim
 		cp -R nvim/. "$$dest"; \
 	fi
 
-nvim-clean: ## 移除 ~/.config/nvim 方便重新同步
-	@if $(DRY_COND); then \
-		echo "[dry-run] rm -rf ~/.config/nvim"; \
-	else \
-		rm -rf ~/.config/nvim; \
-	fi
+nvim-test: ## 驗證 Neovim 設定（stylua 與 headless Lazy sync）
+	@SKIP_STYLUA=$(SKIP_STYLUA) ./scripts/test-nvim.sh
 
 python: ## 安裝指定位 Python 版本並同步 Poetry 設定/專案
 	@DRY_RUN=$(DRY_RUN) ./scripts/setup-python.sh
