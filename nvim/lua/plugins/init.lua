@@ -13,7 +13,7 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
-local function lsp_on_attach(_, bufnr)
+local function lsp_on_attach(client, bufnr)
   local bufmap = function(mode, lhs, rhs, desc)
     vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true, desc = desc })
   end
@@ -24,9 +24,12 @@ local function lsp_on_attach(_, bufnr)
   bufmap("n", "gi", vim.lsp.buf.implementation, "Implementation")
   bufmap("n", "<leader>rn", vim.lsp.buf.rename, "Rename symbol")
   bufmap({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, "Code action")
-  bufmap("n", "<leader>lf", function()
-    vim.lsp.buf.format({ async = true })
-  end, "Format buffer")
+
+  if client and client.supports_method and client:supports_method("textDocument/formatting") then
+    bufmap("n", "<leader>lf", function()
+      vim.lsp.buf.format({ async = true })
+    end, "Format buffer")
+  end
 end
 
 require("lazy").setup({
@@ -117,21 +120,6 @@ require("lazy").setup({
     end,
   },
   {
-    "nvim-tree/nvim-tree.lua",
-    cmd = { "NvimTreeToggle", "NvimTreeFocus" },
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    keys = {
-      { "<leader>e", "<cmd>NvimTreeToggle<CR>", desc = "File explorer" },
-    },
-    config = function()
-      require("nvim-tree").setup({
-        view = { width = 36 },
-        renderer = { highlight_git = true, indent_markers = { enable = true } },
-        filters = { dotfiles = false },
-      })
-    end,
-  },
-  {
     "williamboman/mason.nvim",
     build = ":MasonUpdate",
     cmd = {
@@ -209,17 +197,6 @@ require("lazy").setup({
         desc = "Flash search",
       },
     },
-  },
-  {
-    "akinsho/toggleterm.nvim",
-    version = "*",
-    cmd = "ToggleTerm",
-    config = function()
-      require("toggleterm").setup({
-        open_mapping = [[<c-\>]],
-        direction = "float",
-      })
-    end,
   },
   {
     "stevearc/aerial.nvim",
@@ -349,72 +326,6 @@ require("lazy").setup({
     end,
   },
   {
-    "nvimtools/none-ls.nvim",
-    dependencies = {
-      "jay-babu/mason-null-ls.nvim",
-    },
-    event = { "BufReadPre", "BufNewFile" },
-    config = function()
-      local mason_null_ls = require("mason-null-ls")
-      mason_null_ls.setup({
-        ensure_installed = {
-          "stylua",
-          "prettier",
-          "shfmt",
-          "black",
-        },
-        automatic_installation = true,
-      })
-
-      local null_ls = require("null-ls")
-      null_ls.setup({
-        on_attach = lsp_on_attach,
-        sources = {
-          null_ls.builtins.formatting.stylua,
-          null_ls.builtins.formatting.prettier,
-          null_ls.builtins.formatting.shfmt,
-          null_ls.builtins.formatting.black,
-        },
-      })
-    end,
-  },
-  {
-    "rcarriga/nvim-notify",
-    event = "VeryLazy",
-    config = function()
-      local notify = require("notify")
-      notify.setup({
-        background_colour = "#1a1b26",
-        stages = "fade",
-      })
-      vim.notify = notify
-    end,
-  },
-  {
-    "folke/noice.nvim",
-    event = "VeryLazy",
-    dependencies = {
-      "MunifTanjim/nui.nvim",
-      "rcarriga/nvim-notify",
-    },
-    opts = {
-      presets = {
-        bottom_search = true,
-        command_palette = true,
-        inc_rename = true,
-        long_message_to_split = true,
-      },
-      lsp = {
-        progress = { enabled = false },
-        hover = { enabled = true },
-        signature = { enabled = true },
-      },
-      views = {
-        mini = { border = { style = "rounded" } },
-      },
-    },
-  },
-  {
     "hrsh7th/nvim-cmp",
     event = "InsertEnter",
     dependencies = {
@@ -468,112 +379,6 @@ require("lazy").setup({
         }),
       })
     end,
-  },
-  {
-    "mfussenegger/nvim-dap",
-    dependencies = {
-      "rcarriga/nvim-dap-ui",
-      "theHamsta/nvim-dap-virtual-text",
-      "jay-babu/mason-nvim-dap.nvim",
-    },
-    keys = {
-      {
-        "<leader>db",
-        function()
-          require("dap").toggle_breakpoint()
-        end,
-        desc = "DAP toggle breakpoint",
-      },
-      {
-        "<leader>dc",
-        function()
-          require("dap").continue()
-        end,
-        desc = "DAP continue",
-      },
-      {
-        "<leader>di",
-        function()
-          require("dap").step_into()
-        end,
-        desc = "DAP step into",
-      },
-      {
-        "<leader>do",
-        function()
-          require("dap").step_over()
-        end,
-        desc = "DAP step over",
-      },
-      {
-        "<leader>dO",
-        function()
-          require("dap").step_out()
-        end,
-        desc = "DAP step out",
-      },
-      {
-        "<leader>dt",
-        function()
-          require("dapui").toggle({ reset = true })
-        end,
-        desc = "DAP toggle UI",
-      },
-      {
-        "<leader>dr",
-        function()
-          require("dap").repl.toggle()
-        end,
-        desc = "DAP toggle REPL",
-      },
-    },
-    config = function()
-      local dap = require("dap")
-      local dapui = require("dapui")
-      require("nvim-dap-virtual-text").setup()
-      dapui.setup()
-
-      local mason_dap = require("mason-nvim-dap")
-      mason_dap.setup({
-        ensure_installed = { "python", "delve", "node2" },
-        automatic_installation = true,
-      })
-      mason_dap.setup_handlers()
-
-      dap.listeners.after.event_initialized["dapui_config"] = function()
-        dapui.open()
-      end
-      dap.listeners.before.event_terminated["dapui_config"] = function()
-        dapui.close()
-      end
-      dap.listeners.before.event_exited["dapui_config"] = function()
-        dapui.close()
-      end
-    end,
-  },
-  {
-    "neogitorg/neogit",
-    cmd = "Neogit",
-    dependencies = { "nvim-lua/plenary.nvim" },
-    keys = {
-      {
-        "<leader>gs",
-        function()
-          require("neogit").open()
-        end,
-        desc = "Open Neogit",
-      },
-    },
-    opts = {
-      disable_commit_confirmation = true,
-      integrations = { diffview = false },
-    },
-  },
-  {
-    "folke/trouble.nvim",
-    cmd = { "TroubleToggle", "Trouble" },
-    dependencies = { "nvim-tree/nvim-web-devicons" },
-    opts = {},
   },
   {
     "RRethy/vim-illuminate",
