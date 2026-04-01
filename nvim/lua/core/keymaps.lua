@@ -25,9 +25,11 @@ end, opts)
 map("n", "<leader>bd", ":bdelete<CR>", opts)
 map("n", "<leader>bn", ":bnext<CR>", opts)
 map("n", "<leader>bp", ":bprevious<CR>", opts)
+map("n", "<leader>e", ":Lexplore<CR>", opts)
 
 -- Diagnostics
 map("n", "[d", vim.diagnostic.goto_prev, opts)
 map("n", "]d", vim.diagnostic.goto_next, opts)
 map("n", "<leader>ld", vim.diagnostic.open_float, opts)
 map("n", "<leader>lq", vim.diagnostic.setloclist, opts)
+map("n", "<leader>ll", vim.diagnostic.setqflist, opts)
