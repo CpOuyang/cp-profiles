@@ -48,7 +48,7 @@ fi
 echo "==> Loading lazy plugins"
 nvim \
   --headless \
-  -c 'lua local Config = require("lazy.core.config"); local Loader = require("lazy.core.loader"); local plugins = vim.tbl_keys(Config.plugins); table.sort(plugins); Loader.load(plugins, { cmd = "nvim-test" }, { force = true }); if vim.v.errmsg ~= "" then error(vim.v.errmsg) end' \
+  -c 'lua local Config = require("lazy.core.config"); local Loader = require("lazy.core.loader"); local plugins = vim.tbl_keys(Config.plugins); table.sort(plugins); Loader.load(plugins, { cmd = "nvim-test" }); if vim.v.errmsg ~= "" then error(vim.v.errmsg) end' \
   -c 'qa'
 
 echo "==> Neovim configuration validated"

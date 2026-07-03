@@ -52,6 +52,33 @@ require("lazy").setup({
           section_separators = "",
           component_separators = "",
         },
+        tabline = {
+          lualine_a = {
+            {
+              "buffers",
+              show_filename_only = false,
+              show_modified_status = true,
+              mode = 0,
+              max_length = function()
+                return vim.o.columns
+              end,
+              buffers_color = {
+                active = { fg = "#1b1d2b", bg = "#82aaff", gui = "bold" },
+                inactive = { fg = "#828bb8", bg = "#1e2030" },
+              },
+              symbols = {
+                modified = " +",
+                alternate_file = "",
+                directory = "[dir]",
+              },
+            },
+          },
+          lualine_b = {},
+          lualine_c = {},
+          lualine_x = {},
+          lualine_y = {},
+          lualine_z = {},
+        },
       })
     end,
   },
@@ -221,6 +248,11 @@ require("lazy").setup({
   },
   {
     "nvim-treesitter/nvim-treesitter",
+    -- The legacy nvim-treesitter branch currently installed by this profile
+    -- does not support Neovim 0.12 and can crash the built-in highlighter.
+    cond = function()
+      return vim.fn.has("nvim-0.12") == 0
+    end,
     build = ":TSUpdate",
     event = { "BufReadPost", "BufNewFile" },
     config = function()
@@ -280,10 +312,13 @@ require("lazy").setup({
         },
         pyright = {},
         ts_ls = {},
-        gopls = {},
         jsonls = {},
         yamlls = {},
       }
+
+      if vim.fn.executable("go") == 1 then
+        servers.gopls = {}
+      end
 
       local capabilities = vim.lsp.protocol.make_client_capabilities()
       local cmp_nvim_lsp = require("cmp_nvim_lsp")
@@ -384,7 +419,16 @@ require("lazy").setup({
     "RRethy/vim-illuminate",
     event = "VeryLazy",
     config = function()
-      require("illuminate").configure()
+      require("illuminate").configure({
+        providers = { "regex" },
+        filetypes_denylist = {
+          "dirbuf",
+          "dirvish",
+          "fugitive",
+          "netrw",
+          "TelescopePrompt",
+        },
+      })
     end,
   },
   {
@@ -396,6 +440,7 @@ require("lazy").setup({
 }, {
   defaults = { lazy = true },
   install = { colorscheme = { "tokyonight", "habamax" } },
+  rocks = { enabled = false },
   ui = { border = "rounded" },
   checker = { enabled = true, frequency = 86400 },
 })
