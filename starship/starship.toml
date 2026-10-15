@@ -1,31 +1,86 @@
+# Misty Night Powerline prompt for Bash.
+"$schema" = "https://starship.rs/config-schema.json"
+
+format = """
+[](#1e2433)\
+$os\
+[](bg:#557a95 fg:#1e2433)\
+$directory\
+[ ](fg:#557a95)\
+([](fg:#6e9e8a)\
+$git_branch\
+$git_status\
+$nodejs\
+$python\
+$rust\
+$golang\
+[ ](fg:#6e9e8a))\
+[](fg:#d6b98c)\
+$time\
+[ ](fg:#d6b98c)\
+$line_break\
+$character"""
+
 [aws]
 disabled = true
-
-[character]
-success_symbol = "[➜](bold green)"
-error_symbol = "[✗](bold red)"
-
-[directory]
-format = "[$path]($style)[$read_only]($read_only_style) "
-truncation_length = 4
-truncate_to_repo = false
-truncation_symbol = "…/"
 
 [gcloud]
 disabled = true
 
-[git_branch]
-style = "bold blue"
+[os]
+disabled = false
+style = "bg:#1e2433 fg:#e8edf2"
+format = "[ $symbol ]($style)"
 
-[hostname]
-style = "bold yellow"
+[os.symbols]
+Macos = "󰀵"
+
+[directory]
+style = "bg:#557a95 fg:#f7f8f5"
+format = "[ $path ]($style)"
+truncation_length = 4
+truncate_to_repo = false
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = ""
+style = "bg:#6e9e8a fg:#142a26"
+format = "[ $symbol $branch ]($style)"
+
+[git_status]
+style = "bg:#6e9e8a fg:#142a26"
+format = "[($all_status$ahead_behind )]($style)"
+
+[nodejs]
+symbol = ""
+style = "bg:#6e9e8a fg:#142a26"
+format = "[ $symbol( $version) ]($style)"
+
+[python]
+symbol = ""
+style = "bg:#6e9e8a fg:#142a26"
+format = '[ $symbol( $version)(\(#$virtualenv\)) ]($style)'
+
+[rust]
+symbol = ""
+style = "bg:#6e9e8a fg:#142a26"
+format = "[ $symbol( $version) ]($style)"
+
+[golang]
+symbol = ""
+style = "bg:#6e9e8a fg:#142a26"
+format = "[ $symbol( $version) ]($style)"
 
 [time]
 disabled = false
-format = "[$time]($style) "
-style = "bold purple"
-time_format = "[%T]"
+time_format = "%T"
 utc_time_offset = "+8"
+style = "bg:#d6b98c fg:#2b2a2d"
+format = "[  $time ]($style)"
 
-[username]
-style_user = "bold green"
+[line_break]
+disabled = false
+
+[character]
+success_symbol = "[❯](bold fg:#6e9e8a)"
+error_symbol = "[❯](bold fg:#c77d8b)"

@@ -19,8 +19,10 @@
 - `python/`：pyenv 版本清單、Poetry 預設值與專案列表。
 - `nodejs/`：預留的 Node.js 版本／工具鏈設定。
 - `starship/`：Starship 提示字串主題。
+- `agents/`：Claude planner / Codex executor 的 agentic AI harness，包含工作流與 Shell/Python 偏好規範。
 - `scripts/`：部署與自動化腳本。
 - `.github/workflows/`：CI 工作流程，目前涵蓋 Neovim 設定驗證。
+- `AGENTS.md`：agent 工具的根目錄入口規則，指向 `agents/workflow.md`。
 - `Makefile`：集中管理同步與安裝指令。
 - `.reference/`：歷史或實驗設定的歸檔區。
 
@@ -28,9 +30,6 @@
 - `vscode/`：收錄設定檔、鍵盤配置與 snippets
 - `python/`：預設安裝更多常用 Python 版本 / 套件
 - `nodejs/`：新增版本管理與常用全域工具建議
-
-## 已完成項目
-- 2025-09-22：Neovim Lua 模組說明、`make nvim-test` 驗證流程與 CI 檢查（由 `scripts/test-nvim.sh` 與 `.github/workflows/nvim.yml` 提供）
 
 ## 前置需求
 - macOS（主要開發環境）以及 [Homebrew](https://brew.sh/)；若使用 Linux 或無法安裝 Homebrew，可在執行指令時帶上 `SKIP_BREW=1` 並手動安裝所需套件。
@@ -41,12 +40,13 @@
 1. 先檢視資料夾內容，把與機器相關的私人資訊（token、路徑等）改寫到 `*.local` 類別的忽略檔。
 2. 執行 `make help` 快速查看可用 target 與說明。
 3. `make python`：安裝 `python/versions.txt` 列出的 pyenv 版本、套用 Poetry 預設值並同步清單中的專案（需先安裝 pyenv、Poetry）。
-4. `make bash|zsh|fish`：同步對應 shell 設定；Bash 版會自動建立 `~/.bash_profile.local`。`make bash` 會額外安裝常用 CLI（starship、fzf、ripgrep）。
+4. `make bash|zsh|fish`：同步對應 shell 設定；Bash 版會自動建立 `~/.bash_profile.local`。`make bash` 會額外安裝常用 CLI（starship、fzf、ripgrep），並同步「霧夜藍」Powerline 提示主題（需使用 Nerd Font）。既有 Bash 或 Starship 設定若不同，會先存成同目錄的 `.bak-*` 備份。
 5. `make tmux`：安裝 tmux 並複製設定至 `~/.tmux.conf`。
 6. `make nvim`：同步 Neovim 設定到 `~/.config/nvim/`；第一次啟動建議執行 `:Lazy sync`、`:MasonInstall stylua prettier shfmt black`。
 7. `make nvim-test`：在 headless 模式下進行 Lazy 安裝並執行 stylua 檢查，確保 Neovim 設定可順利啟動。
 8. `make alacritty|kitty|iterm2` 與 `make starship`：安裝終端應用程式（透過 Homebrew cask）並複製對應設定檔。
-9. 需要預覽時可在前面加上 `DRY_RUN=1`，例如 `DRY_RUN=1 make tmux`，指令只會印出動作不寫入檔案。可搭配 `SKIP_BREW=1` 加速純檔案同步，或先執行 `make homebrew` 單獨檢查套件。
+9. `make agents PROJECT_DIR=/path/to/project`：把 agent harness 複製到指定的新專案，會建立 `AGENTS.md`、`agents/README.md`、`agents/workflow.md`、`agents/conventions.md`。若目標專案已有 `AGENTS.md` 或 `agents/`，預設會停止；確認要覆蓋時加上 `FORCE=1`。
+10. 需要預覽時可在前面加上 `DRY_RUN=1`，例如 `DRY_RUN=1 make tmux` 或 `DRY_RUN=1 make agents PROJECT_DIR=/path/to/project`，指令只會印出動作不寫入檔案。可搭配 `SKIP_BREW=1` 加速純檔案同步，或先執行 `make homebrew` 單獨檢查套件。
 
 ## 注意事項
 - 目前僅針對 macOS 設計，其他作業系統暫不支援。

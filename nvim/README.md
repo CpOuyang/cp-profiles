@@ -34,7 +34,7 @@ This setup targets Neovim 0.9+ and relies on [lazy.nvim](https://github.com/folk
 
 ## Testing & CI
 1. Ensure Neovim and (optionally) `stylua` are on `PATH`.
-2. Run `make nvim-test` (or `./scripts/test-nvim.sh`) to format-check Lua files and perform a headless `Lazy! sync` using the repo configuration.
-3. GitHub Actions (`.github/workflows/nvim.yml`) mirrors the same script and stylua check on pushes/PRs touching the Neovim folder.
+2. Run `./scripts/test-nvim-core.sh` for a quick startup check without plugin downloads. Run `make nvim-test` (or `./scripts/test-nvim.sh`) to check Lua formatting and perform a full headless `Lazy! sync`.
+3. GitHub Actions (`.github/workflows/nvim.yml`) runs Stylua and the core startup check on relevant pushes/PRs. A separate plugin sync job runs weekly or on manual dispatch.
 
 Legacy Vimscript (`_init.vim`) is kept for reference but is no longer sourced.

@@ -37,8 +37,8 @@ echo "==> Running headless Lazy sync"
 nvim \
   --headless \
   "+Lazy! sync" \
-  "+checkhealth" \
-  +qa
+  "+lua if vim.v.errmsg ~= '' then vim.api.nvim_err_writeln(vim.v.errmsg); vim.cmd('cquit 1') end" \
+  '+qa!'
 
 if [[ ! -d "${XDG_DATA_HOME}/nvim/lazy/lazy.nvim" ]]; then
   echo "nvim-test: lazy.nvim installation missing. Check network connectivity or permissions." >&2
@@ -48,7 +48,7 @@ fi
 echo "==> Loading lazy plugins"
 nvim \
   --headless \
-  -c 'lua local Config = require("lazy.core.config"); local Loader = require("lazy.core.loader"); local plugins = vim.tbl_keys(Config.plugins); table.sort(plugins); Loader.load(plugins, { cmd = "nvim-test" }, { force = true }); if vim.v.errmsg ~= "" then error(vim.v.errmsg) end' \
-  -c 'qa'
+  -c 'lua local ok, err = pcall(function() local Config = require("lazy.core.config"); local Loader = require("lazy.core.loader"); local plugins = vim.tbl_keys(Config.plugins); table.sort(plugins); Loader.load(plugins, { cmd = "nvim-test" }) end); if not ok or vim.v.errmsg ~= "" then vim.api.nvim_err_writeln(tostring(err or vim.v.errmsg)); vim.cmd("cquit 1") end' \
+  -c 'qa!'
 
 echo "==> Neovim configuration validated"

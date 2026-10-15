@@ -14,12 +14,16 @@ normalize_font_name() {
 }
 
 font_exists() {
-  local patterns=("$(normalize_font_name "$FONT_NAME")" "${FONT_NAME}" "MapleMonoNormal-NF-CN")
+  local patterns=("$(normalize_font_name "$FONT_NAME")" "${FONT_NAME}")
+  if [[ "$FONT_NAME" == "Maple Mono Normal NF CN" ]]; then
+    patterns+=("MapleMonoNormal-NF-CN")
+  fi
   local search_dirs=("$HOME/Library/Fonts" "/Library/Fonts")
+  local dir pattern
   for dir in "${search_dirs[@]}"; do
     [[ -d "$dir" ]] || continue
     for pattern in "${patterns[@]}"; do
-      if find "$dir" -maxdepth 1 -type f -iname "*${pattern}*" -print -quit >/dev/null 2>&1; then
+      if [[ -n "$(find "$dir" -type f -iname "*${pattern}*" -print -quit 2>/dev/null)" ]]; then
         return 0
       fi
     done

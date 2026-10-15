@@ -3,13 +3,15 @@ SHELL := /bin/bash
 DRY_RUN ?= 0
 SKIP_STYLUA ?= 0
 SKIP_BREW ?= 0
+FORCE ?= 0
+PROJECT_DIR ?=
 DRY_COND = [ -n "$(DRY_RUN)" ] && [ "$(DRY_RUN)" != "0" ]
 
 CLEAN_TOP_LEVEL := node_modules build dist out tmp temp coverage .cache .venv venv ENV env target logs
 CLEAN_DIR_PATTERNS := __pycache__ .pytest_cache .mypy_cache .ruff_cache .cache
 CLEAN_FILE_PATTERNS := *~ .DS_Store *.pyc *.log Thumbs.db .project .coverage *.coverage coverage.xml *.swp *.swo
 
-.PHONY: help clean bash zsh fish alacritty kitty iterm2 tmux python starship nvim nvim-test homebrew
+.PHONY: help clean agents bash zsh fish alacritty kitty iterm2 tmux python starship nvim nvim-test homebrew
 
 help: ## 列出可用指令與說明
 	@printf 'make targets:\n'
@@ -51,14 +53,50 @@ clean: ## 清除常見建置與快取資料夾
 homebrew: ## 檢查 Homebrew 並安裝預設套件
 	@DRY_RUN=$(DRY_RUN) ./scripts/setup-homebrew.sh
 
+agents: ## 安裝 agent harness 到指定專案，例：make agents PROJECT_DIR=/path/to/project
+	@if [ -z "$(PROJECT_DIR)" ]; then \
+		echo "PROJECT_DIR is required, e.g. make agents PROJECT_DIR=/path/to/project"; \
+		exit 1; \
+	fi
+	@if [ ! -d "$(PROJECT_DIR)" ]; then \
+		echo "PROJECT_DIR does not exist: $(PROJECT_DIR)"; \
+		exit 1; \
+	fi
+	@if [ "$(FORCE)" != "1" ]; then \
+		if [ -e "$(PROJECT_DIR)/AGENTS.md" ] || [ -e "$(PROJECT_DIR)/agents" ]; then \
+			echo "Agent harness already exists in $(PROJECT_DIR). Re-run with FORCE=1 to overwrite."; \
+			exit 1; \
+		fi; \
+	fi
+	@if $(DRY_COND); then \
+		echo "[dry-run] install AGENTS.md -> $(PROJECT_DIR)/AGENTS.md"; \
+		echo "[dry-run] rm -rf $(PROJECT_DIR)/agents"; \
+		echo "[dry-run] install -d $(PROJECT_DIR)/agents"; \
+		echo "[dry-run] cp -R agents/. -> $(PROJECT_DIR)/agents"; \
+	else \
+		install -m 0644 AGENTS.md "$(PROJECT_DIR)/AGENTS.md"; \
+		rm -rf "$(PROJECT_DIR)/agents"; \
+		install -d "$(PROJECT_DIR)/agents"; \
+		cp -R agents/. "$(PROJECT_DIR)/agents"; \
+	fi
+
 # --- Shell profiles ---------------------------------------------------------
 
 bash: ## 同步 Bash 設定到 ~/.bash_profile，並安裝常用 CLI
 	@$(MAKE) --no-print-directory homebrew
+	@$(MAKE) --no-print-directory starship
 	@if $(DRY_COND); then \
+		echo "[dry-run] (if changed) backup ~/.bash_profile"; \
 		echo "[dry-run] install bash/bash_profile -> ~/.bash_profile"; \
 	else \
-		install -m 0644 bash/bash_profile ~/.bash_profile; \
+		set -e; \
+		dest="$$HOME/.bash_profile"; \
+		if [ -e "$$dest" ] && ! cmp -s bash/bash_profile "$$dest"; then \
+			backup="$$(mktemp "$$dest.bak-XXXXXXXX")"; \
+			cp -p "$$dest" "$$backup"; \
+			echo "Backed up $$dest to $$backup"; \
+		fi; \
+		install -m 0644 bash/bash_profile "$$dest"; \
 	fi
 	@if $(DRY_COND); then \
 		echo "[dry-run] ./scripts/ensure-bash-local.sh"; \
@@ -145,9 +183,17 @@ starship: ## 同步 Starship 主題到 ~/.config/starship.toml
 		install -d ~/.config; \
 	fi
 	@if $(DRY_COND); then \
+		echo "[dry-run] (if changed) backup ~/.config/starship.toml"; \
 		echo "[dry-run] install starship/starship.toml -> ~/.config/starship.toml"; \
 	else \
-		install -m 0644 starship/starship.toml ~/.config/starship.toml; \
+		set -e; \
+		dest="$$HOME/.config/starship.toml"; \
+		if [ -e "$$dest" ] && ! cmp -s starship/starship.toml "$$dest"; then \
+			backup="$$(mktemp "$$dest.bak-XXXXXXXX")"; \
+			cp -p "$$dest" "$$backup"; \
+			echo "Backed up $$dest to $$backup"; \
+		fi; \
+		install -m 0644 starship/starship.toml "$$dest"; \
 	fi
 
 # --- Editors / languages ---------------------------------------------------
