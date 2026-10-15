@@ -5,18 +5,24 @@ on:
     paths:
       - 'nvim/**'
       - 'scripts/test-nvim.sh'
+      - 'scripts/test-nvim-core.sh'
       - '.github/workflows/nvim.yml'
-      - 'Makefile'
   pull_request:
     paths:
       - 'nvim/**'
       - 'scripts/test-nvim.sh'
+      - 'scripts/test-nvim-core.sh'
       - '.github/workflows/nvim.yml'
-      - 'Makefile'
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
+
+env:
+  NVIM_VERSION: v0.12.6
 
 jobs:
   lint-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -28,14 +34,31 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           args: --check nvim
 
-      - name: Install tools
+      - name: Install Neovim
+        run: |
+          curl -fL --retry 3 -o "$RUNNER_TEMP/nvim.tar.gz" "https://github.com/neovim/neovim/releases/download/$NVIM_VERSION/nvim-linux-x86_64.tar.gz"
+          tar -C "$RUNNER_TEMP" -xzf "$RUNNER_TEMP/nvim.tar.gz"
+          echo "$RUNNER_TEMP/nvim-linux-x86_64/bin" >> "$GITHUB_PATH"
+
+      - name: Core startup smoke test
+        run: ./scripts/test-nvim-core.sh
+
+  plugin-sync:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Install tools and Neovim
         run: |
           sudo apt-get update
-          sudo apt-get install -y ripgrep fd-find curl
-          curl -L -o /tmp/nvim.tar.gz https://github.com/neovim/neovim/releases/download/stable/nvim-linux64.tar.gz
-          sudo tar -C /usr/local -xzf /tmp/nvim.tar.gz
-          sudo ln -sf "$(command -v fdfind)" /usr/local/bin/fd
-          echo "/usr/local/nvim-linux64/bin" >> "$GITHUB_PATH"
+          sudo apt-get install -y ripgrep fd-find
+          curl -fL --retry 3 -o "$RUNNER_TEMP/nvim.tar.gz" "https://github.com/neovim/neovim/releases/download/$NVIM_VERSION/nvim-linux-x86_64.tar.gz"
+          tar -C "$RUNNER_TEMP" -xzf "$RUNNER_TEMP/nvim.tar.gz"
+          ln -s "$(command -v fdfind)" "$RUNNER_TEMP/fd"
+          echo "$RUNNER_TEMP" >> "$GITHUB_PATH"
+          echo "$RUNNER_TEMP/nvim-linux-x86_64/bin" >> "$GITHUB_PATH"
 
       - name: Headless Lazy sync
         env:
