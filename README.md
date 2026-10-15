@@ -21,7 +21,7 @@
 - `starship/`：Starship 提示字串主題。
 - `agents/`：Claude planner / Codex executor 的 agentic AI harness，包含工作流與 Shell/Python 偏好規範。
 - `scripts/`：部署與自動化腳本。
-- `.github/workflows/`：CI 工作流程，目前涵蓋 Neovim 設定驗證。
+- `.github/workflows/`、`.gitlab-ci.yml`：GitHub Actions 與 GitLab CI 的 Neovim 設定驗證。
 - `AGENTS.md`：agent 工具的根目錄入口規則，指向 `agents/workflow.md`。
 - `Makefile`：集中管理同步與安裝指令。
 - `.reference/`：歷史或實驗設定的歸檔區。

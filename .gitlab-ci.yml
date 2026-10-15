@@ -1,0 +1,53 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - nvim/**/*
+        - scripts/test-nvim.sh
+        - scripts/test-nvim-core.sh
+        - .gitlab-ci.yml
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_OPEN_MERGE_REQUESTS'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      changes:
+        - nvim/**/*
+        - scripts/test-nvim.sh
+        - scripts/test-nvim-core.sh
+        - .gitlab-ci.yml
+
+default:
+  image: ubuntu:24.04
+  before_script:
+    - apt-get update && apt-get install -y --no-install-recommends ca-certificates curl
+    - curl -fL --retry 3 -o /tmp/nvim.tar.gz "https://github.com/neovim/neovim/releases/download/$NVIM_VERSION/nvim-linux-x86_64.tar.gz"
+    - tar -C /tmp -xzf /tmp/nvim.tar.gz
+    - export PATH="/tmp/nvim-linux-x86_64/bin:$PATH"
+
+variables:
+  NVIM_VERSION: "v0.12.6"
+  STYLUA_VERSION: "v2.4.0"
+
+stages:
+  - test
+
+lint-and-test:
+  stage: test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" || $CI_PIPELINE_SOURCE == "merge_request_event"'
+  script:
+    - apt-get install -y --no-install-recommends unzip
+    - curl -fL --retry 3 -o /tmp/stylua.zip "https://github.com/JohnnyMorganz/StyLua/releases/download/$STYLUA_VERSION/stylua-linux-x86_64.zip"
+    - unzip -q /tmp/stylua.zip -d /tmp
+    - chmod +x /tmp/stylua
+    - /tmp/stylua --check nvim
+    - ./scripts/test-nvim-core.sh
+
+plugin-sync:
+  stage: test
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+  script:
+    - apt-get install -y --no-install-recommends build-essential git ripgrep fd-find unzip
+    - ln -s "$(command -v fdfind)" /usr/local/bin/fd
+    - SKIP_STYLUA=1 ./scripts/test-nvim.sh
