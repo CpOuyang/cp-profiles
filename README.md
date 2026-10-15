@@ -40,7 +40,7 @@
 1. 先檢視資料夾內容，把與機器相關的私人資訊（token、路徑等）改寫到 `*.local` 類別的忽略檔。
 2. 執行 `make help` 快速查看可用 target 與說明。
 3. `make python`：安裝 `python/versions.txt` 列出的 pyenv 版本、套用 Poetry 預設值並同步清單中的專案（需先安裝 pyenv、Poetry）。
-4. `make bash|zsh|fish`：同步對應 shell 設定；Bash 版會自動建立 `~/.bash_profile.local`。`make bash` 會額外安裝常用 CLI（starship、fzf、ripgrep）。
+4. `make bash|zsh|fish`：同步對應 shell 設定；Bash 版會自動建立 `~/.bash_profile.local`。`make bash` 會額外安裝常用 CLI（starship、fzf、ripgrep），並同步「霧夜藍」Powerline 提示主題（需使用 Nerd Font）。既有 Bash 或 Starship 設定若不同，會先存成同目錄的 `.bak-*` 備份。
 5. `make tmux`：安裝 tmux 並複製設定至 `~/.tmux.conf`。
 6. `make nvim`：同步 Neovim 設定到 `~/.config/nvim/`；第一次啟動建議執行 `:Lazy sync`、`:MasonInstall stylua prettier shfmt black`。
 7. `make nvim-test`：在 headless 模式下進行 Lazy 安裝並執行 stylua 檢查，確保 Neovim 設定可順利啟動。

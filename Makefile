@@ -84,10 +84,19 @@ agents: ## 安裝 agent harness 到指定專案，例：make agents PROJECT_DIR=
 
 bash: ## 同步 Bash 設定到 ~/.bash_profile，並安裝常用 CLI
 	@$(MAKE) --no-print-directory homebrew
+	@$(MAKE) --no-print-directory starship
 	@if $(DRY_COND); then \
+		echo "[dry-run] (if changed) backup ~/.bash_profile"; \
 		echo "[dry-run] install bash/bash_profile -> ~/.bash_profile"; \
 	else \
-		install -m 0644 bash/bash_profile ~/.bash_profile; \
+		set -e; \
+		dest="$$HOME/.bash_profile"; \
+		if [ -e "$$dest" ] && ! cmp -s bash/bash_profile "$$dest"; then \
+			backup="$$(mktemp "$$dest.bak-XXXXXXXX")"; \
+			cp -p "$$dest" "$$backup"; \
+			echo "Backed up $$dest to $$backup"; \
+		fi; \
+		install -m 0644 bash/bash_profile "$$dest"; \
 	fi
 	@if $(DRY_COND); then \
 		echo "[dry-run] ./scripts/ensure-bash-local.sh"; \
@@ -174,9 +183,17 @@ starship: ## 同步 Starship 主題到 ~/.config/starship.toml
 		install -d ~/.config; \
 	fi
 	@if $(DRY_COND); then \
+		echo "[dry-run] (if changed) backup ~/.config/starship.toml"; \
 		echo "[dry-run] install starship/starship.toml -> ~/.config/starship.toml"; \
 	else \
-		install -m 0644 starship/starship.toml ~/.config/starship.toml; \
+		set -e; \
+		dest="$$HOME/.config/starship.toml"; \
+		if [ -e "$$dest" ] && ! cmp -s starship/starship.toml "$$dest"; then \
+			backup="$$(mktemp "$$dest.bak-XXXXXXXX")"; \
+			cp -p "$$dest" "$$backup"; \
+			echo "Backed up $$dest to $$backup"; \
+		fi; \
+		install -m 0644 starship/starship.toml "$$dest"; \
 	fi
 
 # --- Editors / languages ---------------------------------------------------
