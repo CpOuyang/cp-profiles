@@ -1,6 +1,6 @@
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
-if not vim.loop.fs_stat(lazypath) then
+if not vim.uv.fs_stat(lazypath) then
   vim.fn.system({
     "git",
     "clone",
@@ -245,47 +245,6 @@ require("lazy").setup({
       indent = { char = "|" },
       scope = { enabled = false },
     },
-  },
-  {
-    "nvim-treesitter/nvim-treesitter",
-    -- The legacy nvim-treesitter branch currently installed by this profile
-    -- does not support Neovim 0.12 and can crash the built-in highlighter.
-    cond = function()
-      return vim.fn.has("nvim-0.12") == 0
-    end,
-    build = ":TSUpdate",
-    event = { "BufReadPost", "BufNewFile" },
-    config = function()
-      require("nvim-treesitter.configs").setup({
-        ensure_installed = {
-          "bash",
-          "css",
-          "dockerfile",
-          "go",
-          "html",
-          "javascript",
-          "json",
-          "lua",
-          "markdown",
-          "markdown_inline",
-          "python",
-          "toml",
-          "tsx",
-          "typescript",
-          "yaml",
-        },
-        highlight = { enable = true },
-        indent = { enable = true },
-        incremental_selection = {
-          enable = true,
-          keymaps = {
-            init_selection = "gnn",
-            node_incremental = "grn",
-            node_decremental = "grm",
-          },
-        },
-      })
-    end,
   },
   {
     "neovim/nvim-lspconfig",

@@ -10,6 +10,23 @@ autocmd("TextYankPost", {
   end,
 })
 
+-- Use Tree-sitter highlighting when Neovim can load a parser for the filetype.
+local treesitter_group = group("CpTreesitter", { clear = true })
+autocmd("FileType", {
+  group = treesitter_group,
+  callback = function(event)
+    local filetype = vim.bo[event.buf].filetype
+    if filetype == "" then
+      return
+    end
+
+    local lang = vim.treesitter.language.get_lang(filetype)
+    if lang and vim.treesitter.language.add(lang) then
+      vim.treesitter.start(event.buf, lang)
+    end
+  end,
+})
+
 -- Restore cursor position when reopening files
 local lastloc = group("CpLastLocation", { clear = true })
 autocmd("BufReadPost", {
