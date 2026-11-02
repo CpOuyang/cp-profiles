@@ -22,7 +22,7 @@ export XDG_CACHE_HOME="${TEST_CACHE_ROOT}/cache"
 
 if ! command -v nvim >/dev/null 2>&1; then
   echo "nvim-test: Neovim is not installed or not on PATH." >&2
-  echo "Install Neovim 0.9+ and retry." >&2
+  echo "Install Neovim 0.12+ and retry." >&2
   exit 1
 fi
 
@@ -36,8 +36,9 @@ fi
 echo "==> Running headless Lazy sync"
 nvim \
   --headless \
+  -c 'lua require("lazy.core.config").options.headless.process = false' \
   "+Lazy! sync" \
-  "+lua if vim.v.errmsg ~= '' then vim.api.nvim_err_writeln(vim.v.errmsg); vim.cmd('cquit 1') end" \
+  -c 'lua local Config = require("lazy.core.config"); local Plugin = require("lazy.core.plugin"); local failed = {}; for name, plugin in pairs(Config.plugins) do if Plugin.has_errors(plugin) then failed[#failed + 1] = name end end; if #failed > 0 then table.sort(failed); vim.api.nvim_err_writeln("nvim-test: Lazy sync failed for " .. table.concat(failed, ", ")); vim.cmd("cquit 1") end; if vim.v.errmsg ~= "" then vim.api.nvim_err_writeln(vim.v.errmsg); vim.cmd("cquit 1") end' \
   '+qa!'
 
 if [[ ! -d "${XDG_DATA_HOME}/nvim/lazy/lazy.nvim" ]]; then

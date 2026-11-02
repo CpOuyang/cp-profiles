@@ -80,9 +80,9 @@ map("n", "<leader><leader>", "<C-^>", opts)
 map("n", "<leader>b", "<cmd>Telescope buffers<CR>", opts)
 
 -- Toggle relative number
-map("n", "<leader>rn", function()
+map("n", "<leader>tn", function()
   vim.opt.relativenumber = not vim.opt.relativenumber:get()
-end, opts)
+end, { silent = true, desc = "Toggle relative line numbers" })
 
 -- Buffer operations
 map("n", "<leader>bd", ":bdelete<CR>", opts)
@@ -91,8 +91,12 @@ map("n", "<leader>bp", previous_buffer, opts)
 map("n", "<leader>e", ":Lexplore<CR>", opts)
 
 -- Diagnostics
-map("n", "[d", vim.diagnostic.goto_prev, opts)
-map("n", "]d", vim.diagnostic.goto_next, opts)
+map("n", "[d", function()
+  vim.diagnostic.jump({ count = -1, float = true })
+end, opts)
+map("n", "]d", function()
+  vim.diagnostic.jump({ count = 1, float = true })
+end, opts)
 map("n", "<leader>ld", vim.diagnostic.open_float, opts)
 map("n", "<leader>lq", vim.diagnostic.setloclist, opts)
 map("n", "<leader>ll", vim.diagnostic.setqflist, opts)

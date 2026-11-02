@@ -1,12 +1,45 @@
 local group = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
 
+-- Netrw defines buffer-local Ctrl-h/l mappings that override window navigation.
+local netrw_group = group("CpNetrwNavigation", { clear = true })
+autocmd("FileType", {
+  group = netrw_group,
+  pattern = "netrw",
+  callback = function(event)
+    for _, direction in ipairs({ "h", "j", "k", "l" }) do
+      vim.keymap.set("n", "<C-" .. direction .. ">", "<C-w>" .. direction, {
+        buffer = event.buf,
+        silent = true,
+        desc = "Move to window " .. direction,
+      })
+    end
+  end,
+})
+
 -- Highlight on yank
 local yank_group = group("CpHighlightYank", { clear = true })
 autocmd("TextYankPost", {
   group = yank_group,
   callback = function()
     vim.highlight.on_yank({ higroup = "IncSearch", timeout = 120 })
+  end,
+})
+
+-- Use Tree-sitter highlighting when Neovim can load a parser for the filetype.
+local treesitter_group = group("CpTreesitter", { clear = true })
+autocmd("FileType", {
+  group = treesitter_group,
+  callback = function(event)
+    local filetype = vim.bo[event.buf].filetype
+    if filetype == "" then
+      return
+    end
+
+    local lang = vim.treesitter.language.get_lang(filetype)
+    if lang and vim.treesitter.language.add(lang) then
+      vim.treesitter.start(event.buf, lang)
+    end
   end,
 })
 
