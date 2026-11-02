@@ -18,7 +18,7 @@
 - `nvim/`：Neovim Lua 設定與外掛管理。
 - `python/`：pyenv 版本清單、Poetry 預設值與專案列表。
 - `nodejs/`：預留的 Node.js 版本／工具鏈設定。
-- `starship/`：Starship 提示字串主題。
+- `starship/`：Starship 單行 Powerline 提示主題。
 - `agents/`：Claude planner / Codex executor 的 agentic AI harness，包含工作流與 Shell/Python 偏好規範。
 - `scripts/`：部署與自動化腳本。
 - `.github/workflows/`、`.gitlab-ci.yml`：GitHub Actions 與 GitLab CI 的 Neovim 設定驗證。
