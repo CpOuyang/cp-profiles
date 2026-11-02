@@ -7,14 +7,12 @@ format = """
 $os\
 [](bg:#557a95 fg:#1e2433)\
 $directory\
-([](bg:#6e9e8a fg:#557a95)\
 $git_branch\
 $git_status\
 $nodejs\
 $python\
 $rust\
 $golang\
-[ ](bg:#d6b98c fg:#6e9e8a))\
 $time\
 [ ](fg:#d6b98c)\
 $character"""
@@ -43,7 +41,7 @@ truncation_symbol = "…/"
 [git_branch]
 symbol = ""
 style = "bg:#6e9e8a fg:#142a26"
-format = "[ $symbol $branch ]($style)"
+format = "[$symbol $branch ]($style)"
 
 [git_status]
 style = "bg:#6e9e8a fg:#142a26"
@@ -51,23 +49,23 @@ format = "[($all_status$ahead_behind )]($style)"
 
 [nodejs]
 symbol = ""
-style = "bg:#6e9e8a fg:#142a26"
-format = "[ $symbol( $version) ]($style)"
+style = "bg:#9a8dad fg:#1f1b29"
+format = "[$symbol( $version) ]($style)"
 
 [python]
 symbol = ""
-style = "bg:#6e9e8a fg:#142a26"
-format = '[ $symbol( $version)(\(#$virtualenv\)) ]($style)'
+style = "bg:#9a8dad fg:#1f1b29"
+format = '[$symbol( $version)(\(#$virtualenv\)) ]($style)'
 
 [rust]
 symbol = ""
-style = "bg:#6e9e8a fg:#142a26"
-format = "[ $symbol( $version) ]($style)"
+style = "bg:#9a8dad fg:#1f1b29"
+format = "[$symbol( $version) ]($style)"
 
 [golang]
 symbol = ""
-style = "bg:#6e9e8a fg:#142a26"
-format = "[ $symbol( $version) ]($style)"
+style = "bg:#9a8dad fg:#1f1b29"
+format = "[$symbol( $version) ]($style)"
 
 [time]
 disabled = false
