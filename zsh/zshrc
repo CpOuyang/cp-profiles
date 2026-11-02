@@ -81,7 +81,7 @@ alias ba='brew autoremove'
 alias bc='brew cleanup'
 alias bd='brew doctor'
 alias bl='brew list -l'
-alias bu='brew update && brew upgrade && brew upgrade --cask $(brew list --cask)'
+alias bu='brew update && brew upgrade --greedy'
 
 alias dc='docker compose'
 
