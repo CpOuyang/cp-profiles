@@ -1,24 +1,22 @@
 # Misty Night Powerline prompt for Bash.
 "$schema" = "https://starship.rs/config-schema.json"
+add_newline = false
 
 format = """
 [](#1e2433)\
 $os\
 [](bg:#557a95 fg:#1e2433)\
 $directory\
-[ ](fg:#557a95)\
-([](fg:#6e9e8a)\
+([](bg:#6e9e8a fg:#557a95)\
 $git_branch\
 $git_status\
 $nodejs\
 $python\
 $rust\
 $golang\
-[ ](fg:#6e9e8a))\
-[](fg:#d6b98c)\
+[ ](bg:#d6b98c fg:#6e9e8a))\
 $time\
 [ ](fg:#d6b98c)\
-$line_break\
 $character"""
 
 [aws]
@@ -76,10 +74,7 @@ disabled = false
 time_format = "%T"
 utc_time_offset = "+8"
 style = "bg:#d6b98c fg:#2b2a2d"
-format = "[  $time ]($style)"
-
-[line_break]
-disabled = false
+format = "[ $time ]($style)"
 
 [character]
 success_symbol = "[❯](bold fg:#6e9e8a)"

@@ -13,6 +13,7 @@ fi
 # Load the core configuration without bootstrapping lazy.nvim or downloading plugins.
 nvim --headless -u NONE -i NONE \
   -c 'lua local ok, err = pcall(function() vim.opt.rtp:prepend(vim.env.NVIM_TEST_CONFIG); vim.g.mapleader = " "; vim.g.maplocalleader = ","; require("core.options"); require("core.autocmds"); require("core.keymaps") end); if not ok then vim.api.nvim_err_writeln(err); vim.cmd("cquit 1") end' \
+  -c 'lua local ok, err = pcall(dofile, vim.env.NVIM_TEST_CONFIG .. "/tests/navigation.lua"); if not ok then vim.api.nvim_err_writeln(err); vim.cmd("cquit 1") end' \
   -c 'qa!'
 
-echo "==> Neovim core configuration validated"
+echo "==> Neovim core configuration and explorer navigation validated"

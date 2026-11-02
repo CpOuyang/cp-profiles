@@ -1,6 +1,22 @@
 local group = vim.api.nvim_create_augroup
 local autocmd = vim.api.nvim_create_autocmd
 
+-- Netrw defines buffer-local Ctrl-h/l mappings that override window navigation.
+local netrw_group = group("CpNetrwNavigation", { clear = true })
+autocmd("FileType", {
+  group = netrw_group,
+  pattern = "netrw",
+  callback = function(event)
+    for _, direction in ipairs({ "h", "j", "k", "l" }) do
+      vim.keymap.set("n", "<C-" .. direction .. ">", "<C-w>" .. direction, {
+        buffer = event.buf,
+        silent = true,
+        desc = "Move to window " .. direction,
+      })
+    end
+  end,
+})
+
 -- Highlight on yank
 local yank_group = group("CpHighlightYank", { clear = true })
 autocmd("TextYankPost", {

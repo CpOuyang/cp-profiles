@@ -31,10 +31,11 @@ This setup targets Neovim 0.12+ and relies on [lazy.nvim](https://github.com/fol
 4. Tree-sitter highlighting starts for filetypes with an available parser; this profile does not install additional parsers. Ensure required LSP servers are installed via `:Mason`.
 5. Formatting now comes from language servers directly; external formatter bridges are not part of this profile.
 6. Use `<leader>lq` for the location list or `<leader>ll` for the quickfix list when you want a lightweight diagnostics view.
+7. Use `Ctrl-h/j/k/l` to move between windows, including the explorer. With the explorer on the left, `Ctrl-h` focuses it and `Ctrl-l` returns to the file window.
 
 ## Testing & CI
 1. Ensure Neovim and (optionally) `stylua` are on `PATH`.
-2. Run `./scripts/test-nvim-core.sh` for a quick startup check without plugin downloads. Run `make nvim-test` (or `./scripts/test-nvim.sh`) to check Lua formatting and perform a full headless `Lazy! sync`.
+2. Run `./scripts/test-nvim-core.sh` to check startup and explorer window navigation without plugin downloads. Run `make nvim-test` (or `./scripts/test-nvim.sh`) to check Lua formatting and perform a full headless `Lazy! sync`.
 3. GitHub Actions (`.github/workflows/nvim.yml`) and GitLab CI (`.gitlab-ci.yml`) run Stylua and the core startup check on relevant pushes and pull or merge requests. A separate plugin sync job runs on a schedule or manually.
 4. For GitLab, create a pipeline schedule under **Build > Pipeline schedules** with cron `17 3 * * 1` in UTC, targeting the default branch. Use **Build > Pipelines > New pipeline** to run the plugin sync manually.
 
