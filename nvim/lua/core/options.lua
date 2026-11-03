@@ -27,8 +27,6 @@ opt.wrap = false
 
 opt.ignorecase = true
 opt.smartcase = true
-opt.hlsearch = true
-opt.incsearch = true
 
 opt.splitbelow = true
 opt.splitright = true

@@ -42,7 +42,7 @@
 3. `make python`：安裝 `python/versions.txt` 列出的 pyenv 版本、套用 Poetry 預設值並同步清單中的專案（需先安裝 pyenv、Poetry）。
 4. `make bash|zsh|fish`：同步對應 shell 設定；Bash 版會自動建立 `~/.bash_profile.local`。`make bash` 會額外安裝常用 CLI（starship、fzf、ripgrep），並同步「霧夜藍」Powerline 提示主題（需使用 Nerd Font）。既有 Bash 或 Starship 設定若不同，會先存成同目錄的 `.bak-*` 備份。
 5. `make tmux`：安裝 tmux 並複製設定至 `~/.tmux.conf`。
-6. `make nvim`：同步 Neovim 設定到 `~/.config/nvim/`；第一次啟動建議執行 `:Lazy sync`、`:MasonInstall stylua prettier shfmt black`。
+6. `make nvim`：同步 Neovim 設定到 `~/.config/nvim/`；第一次啟動建議執行 `:Lazy sync`。格式化由語言伺服器提供。
 7. `make nvim-test`：在 headless 模式下進行 Lazy 安裝並執行 stylua 檢查，確保 Neovim 設定可順利啟動。
 8. `make alacritty|kitty|iterm2` 與 `make starship`：安裝終端應用程式（透過 Homebrew cask）並複製對應設定檔。
 9. `make agents PROJECT_DIR=/path/to/project`：把 agent harness 複製到指定的新專案，會建立 `AGENTS.md`、`agents/README.md`、`agents/workflow.md`、`agents/conventions.md`。若目標專案已有 `AGENTS.md` 或 `agents/`，預設會停止；確認要覆蓋時加上 `FORCE=1`。

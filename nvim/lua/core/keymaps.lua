@@ -73,11 +73,7 @@ map("n", "<leader>4", "4gt", opts)
 map("n", "<leader>h", ":nohlsearch<CR>", opts)
 
 -- Open buffer navigation
-map("n", "<Tab>", next_buffer, opts)
-map("n", "<S-Tab>", previous_buffer, opts)
-map("n", "<BackTab>", previous_buffer, opts)
 map("n", "<leader><leader>", "<C-^>", opts)
-map("n", "<leader>b", "<cmd>Telescope buffers<CR>", opts)
 
 -- Toggle relative number
 map("n", "<leader>tn", function()
