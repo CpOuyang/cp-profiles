@@ -106,9 +106,17 @@ bash: ## 同步 Bash 設定到 ~/.bash_profile，並安裝常用 CLI
 
 zsh: ## 同步 Zsh 設定到 ~/.zshrc
 	@if $(DRY_COND); then \
+		echo "[dry-run] (if changed) backup ~/.zshrc"; \
 		echo "[dry-run] install zsh/zshrc -> ~/.zshrc"; \
 	else \
-		install -m 0644 zsh/zshrc ~/.zshrc; \
+		set -e; \
+		dest="$$HOME/.zshrc"; \
+		if [ -e "$$dest" ] && ! cmp -s zsh/zshrc "$$dest"; then \
+			backup="$$(mktemp "$$dest.bak-XXXXXXXX")"; \
+			cp -p "$$dest" "$$backup"; \
+			echo "Backed up $$dest to $$backup"; \
+		fi; \
+		install -m 0644 zsh/zshrc "$$dest"; \
 	fi
 
 fish: ## 同步 Fish 設定到 ~/.config/fish/config.fish
@@ -118,9 +126,17 @@ fish: ## 同步 Fish 設定到 ~/.config/fish/config.fish
 		install -d ~/.config/fish; \
 	fi
 	@if $(DRY_COND); then \
+		echo "[dry-run] (if changed) backup ~/.config/fish/config.fish"; \
 		echo "[dry-run] install fish/config.fish -> ~/.config/fish/config.fish"; \
 	else \
-		install -m 0644 fish/config.fish ~/.config/fish/config.fish; \
+		set -e; \
+		dest="$$HOME/.config/fish/config.fish"; \
+		if [ -e "$$dest" ] && ! cmp -s fish/config.fish "$$dest"; then \
+			backup="$$(mktemp "$$dest.bak-XXXXXXXX")"; \
+			cp -p "$$dest" "$$backup"; \
+			echo "Backed up $$dest to $$backup"; \
+		fi; \
+		install -m 0644 fish/config.fish "$$dest"; \
 	fi
 
 # --- Terminal configs ------------------------------------------------------
@@ -128,13 +144,21 @@ fish: ## 同步 Fish 設定到 ~/.config/fish/config.fish
 alacritty: ## 安裝 Alacritty (Homebrew cask) 並同步設定
 	@DRY_RUN=$(DRY_RUN) BREW_FORMULAS="" BREW_CASKS="alacritty" ./scripts/setup-homebrew.sh
 	@DRY_RUN=$(DRY_RUN) SKIP_BREW=$(SKIP_BREW) ./scripts/ensure-font.sh "Maple Mono Normal NF CN" "font-maple-mono-nerd-font"
-	@dest="$$HOME/.config/alacritty"; \
+	@set -e; \
+	dest="$$HOME/.config/alacritty"; \
 	if $(DRY_COND); then \
-		echo "[dry-run] rm -rf $$dest"; \
+		echo "[dry-run] (if changed) mv $$dest $$dest.bak-<timestamp>"; \
+		echo "[dry-run] (if identical) rm -rf $$dest"; \
 		echo "[dry-run] install -d $$HOME/.config"; \
 		echo "[dry-run] cp -R alacritty $$dest"; \
 	else \
-		rm -rf "$$dest"; \
+		if [ -L "$$dest" ] || { [ -e "$$dest" ] && { [ ! -d "$$dest" ] || ! diff -rq alacritty "$$dest" >/dev/null 2>&1; }; }; then \
+			backup="$$dest.bak-$$(date +%Y%m%d%H%M%S)"; \
+			mv "$$dest" "$$backup"; \
+			echo "Backed up $$dest to $$backup"; \
+		else \
+			rm -rf "$$dest"; \
+		fi; \
 		install -d "$$HOME/.config"; \
 		cp -R alacritty "$$dest"; \
 	fi
@@ -142,13 +166,21 @@ alacritty: ## 安裝 Alacritty (Homebrew cask) 並同步設定
 kitty: ## 安裝 Kitty (Homebrew cask) 並同步設定
 	@DRY_RUN=$(DRY_RUN) BREW_FORMULAS="" BREW_CASKS="kitty" ./scripts/setup-homebrew.sh
 	@DRY_RUN=$(DRY_RUN) SKIP_BREW=$(SKIP_BREW) ./scripts/ensure-font.sh "Maple Mono Normal NF CN" "font-maple-mono-nerd-font"
-	@dest="$$HOME/.config/kitty"; \
+	@set -e; \
+	dest="$$HOME/.config/kitty"; \
 	if $(DRY_COND); then \
-		echo "[dry-run] rm -rf $$dest"; \
+		echo "[dry-run] (if changed) mv $$dest $$dest.bak-<timestamp>"; \
+		echo "[dry-run] (if identical) rm -rf $$dest"; \
 		echo "[dry-run] install -d $$HOME/.config"; \
 		echo "[dry-run] cp -R kitty $$dest"; \
 	else \
-		rm -rf "$$dest"; \
+		if [ -L "$$dest" ] || { [ -e "$$dest" ] && { [ ! -d "$$dest" ] || ! diff -rq kitty "$$dest" >/dev/null 2>&1; }; }; then \
+			backup="$$dest.bak-$$(date +%Y%m%d%H%M%S)"; \
+			mv "$$dest" "$$backup"; \
+			echo "Backed up $$dest to $$backup"; \
+		else \
+			rm -rf "$$dest"; \
+		fi; \
 		install -d "$$HOME/.config"; \
 		cp -R kitty "$$dest"; \
 	fi
@@ -171,9 +203,17 @@ iterm2: ## 安裝 iTerm2 (Homebrew cask) 並同步動態設定檔
 tmux: ## 安裝 tmux 並同步 ~/.tmux.conf
 	@DRY_RUN=$(DRY_RUN) BREW_FORMULAS="tmux" ./scripts/setup-homebrew.sh
 	@if $(DRY_COND); then \
+		echo "[dry-run] (if changed) backup ~/.tmux.conf"; \
 		echo "[dry-run] install tmux/tmux.conf -> ~/.tmux.conf"; \
 	else \
-		install -m 0644 tmux/tmux.conf ~/.tmux.conf; \
+		set -e; \
+		dest="$$HOME/.tmux.conf"; \
+		if [ -e "$$dest" ] && ! cmp -s tmux/tmux.conf "$$dest"; then \
+			backup="$$(mktemp "$$dest.bak-XXXXXXXX")"; \
+			cp -p "$$dest" "$$backup"; \
+			echo "Backed up $$dest to $$backup"; \
+		fi; \
+		install -m 0644 tmux/tmux.conf "$$dest"; \
 	fi
 
 starship: ## 同步 Starship 主題到 ~/.config/starship.toml
