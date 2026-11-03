@@ -22,7 +22,7 @@ local yank_group = group("CpHighlightYank", { clear = true })
 autocmd("TextYankPost", {
   group = yank_group,
   callback = function()
-    vim.highlight.on_yank({ higroup = "IncSearch", timeout = 120 })
+    vim.hl.on_yank({ higroup = "IncSearch", timeout = 120 })
   end,
 })
 
@@ -81,7 +81,9 @@ autocmd("FileType", {
 })
 
 -- When opening help, make it vertical
+local help_group = group("CpHelpVertical", { clear = true })
 autocmd("FileType", {
+  group = help_group,
   pattern = "help",
   callback = function()
     vim.cmd.wincmd("L")

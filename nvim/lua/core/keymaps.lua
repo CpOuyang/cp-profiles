@@ -9,32 +9,10 @@ local function previous_buffer()
   vim.cmd.bprevious()
 end
 
-local function focus_file_window()
-  local current_win = vim.api.nvim_get_current_win()
-
-  vim.cmd.wincmd("l")
-  if vim.bo.filetype ~= "netrw" then
-    return true
-  end
-
-  for _, win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-    local buf = vim.api.nvim_win_get_buf(win)
-    if vim.bo[buf].filetype ~= "netrw" and vim.bo[buf].buftype == "" then
-      vim.api.nvim_set_current_win(win)
-      return true
-    end
-  end
-
-  vim.api.nvim_set_current_win(current_win)
-  return false
-end
-
 local function smart_quit()
   if vim.bo.filetype == "netrw" and vim.fn.winnr("$") > 1 then
-    if not focus_file_window() then
-      vim.cmd.quit()
-      return
-    end
+    vim.cmd.close()
+    return
   end
 
   local listed_buffers = vim.tbl_filter(function(buf)

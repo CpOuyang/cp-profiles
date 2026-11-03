@@ -71,7 +71,8 @@ make python
 不要把 token、密鑰或只屬於某台機器的路徑寫進 repo，改放在不受版本控制的 `*.local` 檔案：
 
 - Bash 會自動載入 `~/.bash_profile.local` 與 `~/.bashrc.local`；`make bash` 會在檔案不存在時建立 `~/.bash_profile.local`。
-- Zsh 與 Fish 目前沒有對應的 `.local` 載入機制，需要時請自行加入。
+- Zsh 會自動載入 `~/.zshrc.local` 與 `~/.zshenv.local`。
+- Fish 會自動載入 `~/.config/fish/local.fish`。
 
 `.venv/`、`.env` 等虛擬環境與環境變數檔已列在 `.gitignore`，新增類似檔案時請一併確認。
 
@@ -79,7 +80,6 @@ make python
 
 - **Neovim 測試**：`make nvim-test` 會檢查 Lua 格式、在隔離目錄同步並載入所有外掛；GitHub Actions 與 GitLab CI 會在 Neovim 設定變動時自動執行核心測試。細節見 [nvim/README.md](nvim/README.md#testing)。
 - **AI 協作**：本 repo 使用 Claude 規劃、Codex 執行、使用者決策的流程，入口是 [`AGENTS.md`](AGENTS.md)，完整規則在 [`agents/`](agents/README.md)。
-- **歸檔**：`.reference/` 只放歷史或實驗用設定，正式使用的設定請移到上方對應目錄。
 - **支援範圍**：目前只針對 macOS。Linux 可以用 `SKIP_BREW=1` 同步設定檔並自行安裝套件，但沒有經過測試。
 
 ## 待辦

@@ -90,9 +90,9 @@ sync_poetry_projects() {
       continue
     fi
     if [[ "$DRY_RUN" != "0" ]]; then
-      printf '[dry-run] (cd %s && poetry install --sync)\n' "$project"
+      printf '[dry-run] (cd %s && poetry sync)\n' "$project"
     else
-      (cd "$abs_path" && poetry install --sync)
+      (cd "$abs_path" && poetry sync)
     fi
   done <"$PROJECTS_FILE"
 }
