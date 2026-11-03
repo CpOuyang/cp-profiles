@@ -50,6 +50,7 @@ echo "==> Loading lazy plugins"
 nvim \
   --headless \
   -c 'lua local ok, err = pcall(function() local Config = require("lazy.core.config"); local Loader = require("lazy.core.loader"); local plugins = vim.tbl_keys(Config.plugins); table.sort(plugins); Loader.load(plugins, { cmd = "nvim-test" }) end); if not ok or vim.v.errmsg ~= "" then vim.api.nvim_err_writeln(tostring(err or vim.v.errmsg)); vim.cmd("cquit 1") end' \
+  -c 'lua local ok, err = pcall(dofile, vim.fn.stdpath("config") .. "/tests/lsp.lua"); if not ok then vim.api.nvim_err_writeln(err); vim.cmd("cquit 1") end' \
   -c 'qa!'
 
 echo "==> Neovim configuration validated"

@@ -3,7 +3,7 @@
 This folder stores dynamic profiles so iTerm2 can pick up the same colour palette and font settings used elsewhere in cp-profiles.
 
 ## Files
-- `DynamicProfiles/cp-profiles.json` – a dynamic profile that targets Hack Nerd Font Mono, enables a subtle badge colour, and applies a tokyonight-inspired palette.
+- `DynamicProfiles/cp-profiles.json` – a dynamic profile that targets Maple Mono Normal NF CN 13, enables a subtle badge colour, and applies a tokyonight-inspired palette.
 
 ## Usage
 1. Run `make iterm2` to install the Homebrew cask (unless `SKIP_BREW=1`) and copy the dynamic profile into `~/Library/Application Support/iTerm2/DynamicProfiles/`.
