@@ -198,20 +198,25 @@ starship: ## 同步 Starship 主題到 ~/.config/starship.toml
 
 # --- Editors / languages ---------------------------------------------------
 
-nvim: ## 同步 Neovim 設定到 ~/.config/nvim
-	@dest="$$HOME/.config/nvim"; backup="$$dest.bak-$$(date +%Y%m%d%H%M%S)"; \
-	if $(DRY_COND); then \
-		echo "[dry-run] (if exists) mv $$dest $$backup"; \
-		echo "[dry-run] rm -rf $$dest"; \
-		echo "[dry-run] install -d $$dest"; \
-		echo "[dry-run] cp -R nvim/. $$dest"; \
+nvim: ## 以 symlink 連結 Neovim 設定到 ~/.config/nvim
+	@set -e; \
+	dest="$$HOME/.config/nvim"; target="$(CURDIR)/nvim"; \
+	backup="$$dest.bak-$$(date +%Y%m%d%H%M%S)"; \
+	if [ -L "$$dest" ] && [ "$$(cd "$$dest" 2>/dev/null && pwd -P)" = "$$(cd "$$target" && pwd -P)" ]; then \
+		echo "Neovim config is already linked to $$target"; \
+	elif $(DRY_COND); then \
+		if [ -L "$$dest" ] || [ -e "$$dest" ]; then \
+			echo "[dry-run] mv $$dest $$backup"; \
+		fi; \
+		echo "[dry-run] install -d $$HOME/.config"; \
+		echo "[dry-run] ln -sfn $$target $$dest"; \
 	else \
-		if [ -d "$$dest" ] || [ -f "$$dest" ]; then \
+		if [ -L "$$dest" ] || [ -e "$$dest" ]; then \
 			echo "Backing up existing Neovim config to $$backup"; \
 			mv "$$dest" "$$backup"; \
 		fi; \
-		install -d "$$dest"; \
-		cp -R nvim/. "$$dest"; \
+		install -d "$$HOME/.config"; \
+		ln -sfn "$$target" "$$dest"; \
 	fi
 
 nvim-test: ## 驗證 Neovim 設定（stylua 與 headless Lazy sync）

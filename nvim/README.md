@@ -26,6 +26,8 @@ This setup targets Neovim 0.12+ and relies on [lazy.nvim](https://github.com/fol
 - Philosophy: keep the config focused on editing, search, and LSP. Debugging, Git porcelain UIs, message overhauls, and terminal multiplexing are intentionally left to external tools.
 
 ## Usage
+Run `make nvim` from the repository root to link `~/.config/nvim` to this repository's `nvim/` directory. Keep the repository in place; edits to the configuration are live through the symlink. `:Lazy update` writes directly to `nvim/lazy-lock.json` in the repository. Review changes with `git diff`, then commit them or discard them with `git checkout -- nvim/lazy-lock.json`.
+
 1. Launch Neovim; lazy.nvim will install itself automatically.
 2. Press `<leader>ff` to search files, `<leader>e` to open the built-in explorer, `<leader>rn` to rename symbols, `<leader>tn` to toggle relative line numbers, and `<leader>ca` for code actions.
 3. Run `:Lazy sync` after editing plugin specs to install or update plugins.
