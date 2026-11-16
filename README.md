@@ -39,6 +39,7 @@ make python     # 尚未穩定開發
 | `tmux/` | `make tmux` | `~/.tmux.conf` | |
 | `alacritty/` | `make alacritty` | `~/.config/alacritty/` | |
 | `kitty/` | `make kitty` | `~/.config/kitty/` | [說明](kitty/README.md) |
+| `ghostty/` | `make ghostty` | `~/.config/ghostty/` | [說明](ghostty/README.md) |
 | `iterm2/` | `make iterm2` | iTerm2 `DynamicProfiles/cp-profiles.json` | [說明](iterm2/README.md) |
 | `nvim/` | `make nvim` | `~/.config/nvim`（symlink） | [說明](nvim/README.md) |
 | `python/` | `make python` | pyenv、Poetry | 依 `versions.txt`、`poetry.toml`、`projects.txt` 安裝 |
@@ -49,7 +50,7 @@ make python     # 尚未穩定開發
 
 - 除 `nvim` 為 symlink（修改即生效，repo 勿移動），其餘皆為複製，修改後需重新執行指令。
 - 既有設定內容不同時備份為 `<原名稱>.bak-*`；`nvim` 一律備份，`iterm2` 直接覆蓋，`agents` 遇既有檔案即停止（`FORCE=1` 覆蓋）。
-- `tmux`、`alacritty`、`kitty`、`iterm2` 會透過 Homebrew 安裝對應程式。
+- `tmux`、`alacritty`、`kitty`、`ghostty`、`iterm2` 會透過 Homebrew 安裝對應程式。
 
 ## 選項與其他指令
 

@@ -11,7 +11,7 @@ CLEAN_TOP_LEVEL := node_modules build dist out tmp temp coverage .cache .venv ve
 CLEAN_DIR_PATTERNS := __pycache__ .pytest_cache .mypy_cache .ruff_cache .cache
 CLEAN_FILE_PATTERNS := *~ .DS_Store *.pyc *.log Thumbs.db .project .coverage *.coverage coverage.xml *.swp *.swo
 
-.PHONY: help clean agents bash zsh fish alacritty kitty iterm2 tmux python starship nvim nvim-test homebrew
+.PHONY: help clean agents bash zsh fish alacritty kitty ghostty iterm2 tmux python starship nvim nvim-test homebrew
 
 help: ## 列出可用指令與說明
 	@printf 'make targets:\n'
@@ -183,6 +183,38 @@ kitty: ## 安裝 Kitty (Homebrew cask) 並同步設定
 		fi; \
 		install -d "$$HOME/.config"; \
 		cp -R kitty "$$dest"; \
+	fi
+
+ghostty: ## 安裝 Ghostty (Homebrew cask) 並同步設定
+	@DRY_RUN=$(DRY_RUN) BREW_FORMULAS="" BREW_CASKS="ghostty" ./scripts/setup-homebrew.sh
+	@DRY_RUN=$(DRY_RUN) SKIP_BREW=$(SKIP_BREW) ./scripts/ensure-font.sh "Maple Mono Normal NF CN" "font-maple-mono-nerd-font"
+	@set -e; \
+	dest="$$HOME/.config/ghostty"; \
+	override="$$HOME/Library/Application Support/com.mitchellh.ghostty/config.ghostty"; \
+	if $(DRY_COND); then \
+		echo "[dry-run] (if changed) mv $$dest $$dest.bak-<timestamp>"; \
+		echo "[dry-run] (if identical) rm -rf $$dest"; \
+		echo "[dry-run] install -d $$HOME/.config"; \
+		echo "[dry-run] cp -R ghostty $$dest"; \
+		echo "[dry-run] ghostty +validate-config --config-file=\"$$dest/config.ghostty\""; \
+	else \
+		if [ -L "$$dest" ] || { [ -e "$$dest" ] && { [ ! -d "$$dest" ] || ! diff -rq ghostty "$$dest" >/dev/null 2>&1; }; }; then \
+			backup="$$dest.bak-$$(date +%Y%m%d%H%M%S)"; \
+			mv "$$dest" "$$backup"; \
+			echo "Backed up $$dest to $$backup"; \
+		else \
+			rm -rf "$$dest"; \
+		fi; \
+		install -d "$$HOME/.config"; \
+		cp -R ghostty "$$dest"; \
+		if command -v ghostty >/dev/null 2>&1; then \
+			ghostty +validate-config --config-file="$$dest/config.ghostty"; \
+		else \
+			echo "Skipping Ghostty config validation: ghostty command not found."; \
+		fi; \
+	fi; \
+	if [ -f "$$override" ] && grep -Eq '^[[:space:]]*[^[:space:]#]' "$$override"; then \
+		echo "Warning: $$override contains active settings and may override $$dest/config.ghostty on macOS."; \
 	fi
 
 iterm2: ## 安裝 iTerm2 (Homebrew cask) 並同步動態設定檔
